@@ -8,6 +8,7 @@ function App() {
       <div className="header">日程表</div>
       <div className="body">
         <Buttons />
+        
       </div>
     </>
   )

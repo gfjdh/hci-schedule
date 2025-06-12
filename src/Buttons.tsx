@@ -45,6 +45,12 @@ function Buttons() {
           <CustomButton width="8vw">设置</CustomButton>
           <CustomButton width="8vw">帮助</CustomButton> 
         </span>
+        <span className="command">
+          <CustomButton width="8vw"> 语音输入 </CustomButton>
+          <label className="command-label">指令</label>
+          <input type="text" className="command-input" placeholder="请输入指令"/>
+          <CustomButton width="5vw">执行</CustomButton>
+        </span>
         <span className="page">
           当前在第
           <CustomButton width="3vw" spacing="8px" onClick={handlePrevPage}>←</CustomButton>
