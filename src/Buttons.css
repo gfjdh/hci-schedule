@@ -12,7 +12,7 @@
   background-color: var(--buttons-bg-color);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;

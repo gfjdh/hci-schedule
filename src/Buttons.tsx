@@ -1,4 +1,3 @@
-import React, { useState } from "react"
 import "./Buttons.css"
 
 interface CustomButtonProps {
@@ -8,12 +7,12 @@ interface CustomButtonProps {
   onClick?: () => void;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({
+export const CustomButton = ({
   children,
   width = "80px",
   spacing = "8px",
   onClick,
-}) => {
+}: CustomButtonProps) => {
   return (
     <button
       style={{
@@ -29,37 +28,16 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 };
 
 function Buttons() {
-  const [page, setPage] = useState(1);
-
-  const handlePrevPage = () => {
-    setPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    setPage((prev) => prev + 1);
-  };
   return (
     <>
-      <div className="buttons">
-        <span className="configBtn">
-          <CustomButton width="8vw">设置</CustomButton>
-          <CustomButton width="8vw">帮助</CustomButton> 
-        </span>
-        <span className="command">
-          <CustomButton width="8vw"> 语音输入 </CustomButton>
-          <label className="command-label">指令</label>
-          <input type="text" className="command-input" placeholder="请输入指令"/>
-          <CustomButton width="5vw">执行</CustomButton>
-        </span>
-        <span className="page">
-          当前在第
-          <CustomButton width="3vw" spacing="8px" onClick={handlePrevPage}>←</CustomButton>
-          <span className="page-number">{page}</span>
-          <CustomButton width="3vw" spacing="8px" onClick={handleNextPage}>→</CustomButton>
-          页
-        </span>
-      </div>
-    </>
+    <div className="buttons">
+      <span className="configBtn">
+        <CustomButton width="8vw">🏠主页</CustomButton>
+        <CustomButton width="8vw">⚙设置</CustomButton>
+        <CustomButton width="8vw">❓帮助</CustomButton>
+      </span>
+    </div>
+  </>
   )
 }
 
