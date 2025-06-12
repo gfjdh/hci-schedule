@@ -1,13 +1,14 @@
 :root {
   --button-bg-color: #f1ebeb;
   --button-text-color: #251e81;
-  --button-hover-bg-color: #ffffff;
+  --button-hover-bg-color: #d4f6ff;
   --button-hover-text-color: #62cbdb;
   --button-active-bg-color: #e0e0e0;
   --button-active-text-color: #000000;
 }
 
 .buttons {
+  background-color: var(--buttons-bg-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,9 +43,15 @@
   color: var(--button-hover-text-color);
 }
 
-.button:clicked {
+.button:active {
   background-color: var(--button-active-bg-color);
   color: var(--button-active-text-color);
+}
+
+.button:focus {
+  outline: none;
+  /* 取消点击或键盘聚焦时的黑色边框 */
+  box-shadow: none;
 }
 
 .page {
