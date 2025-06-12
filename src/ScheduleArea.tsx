@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import EventTile from './EventTile';
-import {CustomButton} from './Buttons';
+import { CustomButton } from './Buttons';
 import './ScheduleArea.css';
 
 interface Event {
@@ -21,7 +21,7 @@ interface Event {
 
 const ScheduleArea: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  
+
   // 示例事件数据
   const events: Event[] = [
     {
@@ -94,10 +94,10 @@ const ScheduleArea: React.FC = () => {
       <div className="voice-area">
         <CustomButton width="8vw">🎤 语音输入</CustomButton>
         <span className="command">
-        <label className="command-label">指令</label>
-        <input type="text" className="command-input" placeholder="请输入指令"/>
-        <CustomButton width="5vw">执行</CustomButton>
-      </span>
+          <label className="command-label">指令</label>
+          <input type="text" className="command-input" placeholder="请输入指令" />
+          <CustomButton width="5vw">执行</CustomButton>
+        </span>
       </div>
       <div className="content-area">
         <div className="quadrant-view">
@@ -109,10 +109,10 @@ const ScheduleArea: React.FC = () => {
           <div className="quadrants">
             {events
               .map(event => (
-                <EventTile 
-                  key={event.id} 
-                  event={event} 
-                  onClick={() => handleEventClick(event)} 
+                <EventTile
+                  key={event.id}
+                  event={event}
+                  onClick={() => handleEventClick(event)}
                 />
               ))}
           </div>
@@ -122,37 +122,37 @@ const ScheduleArea: React.FC = () => {
           {selectedEvent ? (
             <div className="event-details">
               <h3>{selectedEvent.name}</h3>
-              
+
               <div className="detail-item">
                 <span className="detail-label">时间</span>
                 <div className="detail-value">
-                  {new Date(selectedEvent.startTime).toLocaleString()} - 
+                  {new Date(selectedEvent.startTime).toLocaleString()} -
                   {new Date(selectedEvent.endTime).toLocaleTimeString()}
                 </div>
               </div>
-              
+
               <div className="detail-item">
                 <span className="detail-label">紧迫性</span>
                 <div className="detail-value">
-                  <span className="color-indicator" style={{backgroundColor: selectedEvent.color}}></span>
+                  <span className="color-indicator" style={{ backgroundColor: selectedEvent.color }}></span>
                   {selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'}
                 </div>
               </div>
-              
+
               <div className="detail-item">
                 <span className="detail-label">重要性</span>
                 <div className="detail-value">
                   {selectedEvent.importance > 0.7 ? '高' : selectedEvent.importance > 0.4 ? '中' : '低'}
                 </div>
               </div>
-              
+
               <div className="detail-item">
                 <span className="detail-label">剩余工作量</span>
                 <div className="detail-value">
                   {selectedEvent.size}%
                 </div>
               </div>
-              
+
               {selectedEvent.details?.location && (
                 <div className="detail-item">
                   <span className="detail-label">地点</span>
@@ -161,7 +161,7 @@ const ScheduleArea: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {selectedEvent.details?.estimatedHours && (
                 <div className="detail-item">
                   <span className="detail-label">预计耗时</span>
@@ -170,7 +170,7 @@ const ScheduleArea: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {selectedEvent.details?.notes && (
                 <div className="detail-item">
                   <span className="detail-label">备注</span>
