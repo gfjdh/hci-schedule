@@ -1,0 +1,65 @@
+:root {
+  --button-bg-color: #f1ebeb;
+  --button-text-color: #251e81;
+  --button-hover-bg-color: #ffffff;
+  --button-hover-text-color: #62cbdb;
+  --button-active-bg-color: #e0e0e0;
+  --button-active-text-color: #000000;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.configBtn {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: 40vw;
+}
+
+.button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 8px;
+  margin: 0.5em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.25s, color 0.25s;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: var(--button-hover-bg-color);
+  color: var(--button-hover-text-color);
+}
+
+.button:clicked {
+  background-color: var(--button-active-bg-color);
+  color: var(--button-active-text-color);
+}
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-right: 10vw;
+}
+
+.page-number {
+  display: inline-block;
+  min-width: 2em;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #1976d2;
+}
