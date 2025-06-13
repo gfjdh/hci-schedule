@@ -607,9 +607,24 @@ const ScheduleArea: React.FC = () => {
               <div className="detail-item">
                 <span className="detail-label">紧迫性</span>
                 <div className="detail-value">
-                  <span className="color-indicator" style={{ backgroundColor: selectedEvent.color }}></span>
-                  {selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'}
-                </div>
+                  {
+                    isEditing ? (
+                      <div className="edit-fields">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={tempEvent?.urgency || 0}
+                          onChange={(e) => handleFieldChange('urgency', parseFloat(e.target.value))}
+                          className="edit-slider"
+                        />
+                        <span>{tempEvent?.urgency?.toFixed(2)}</span>
+                      </div>
+                    ) : (
+                      selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'
+                    )}
+                  </div>
               </div>
 
               {/* 重要性字段 */}
