@@ -40,6 +40,7 @@
   outline: none;
   box-shadow: none;
   padding: 0.5em 1.2em;
+  min-width: 130px;
 }
 
 .button:last-child {

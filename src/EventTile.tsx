@@ -30,8 +30,8 @@ const EventTile: React.FC<EventTileProps> = ({ event, onClick }) => {
       onClick={onClick}
       style={{
         position: 'absolute',
-        left: `${event.importance * 90}%`,
-        top: `${(1 - event.urgency) * 90}%`,
+        top: `${(1 - event.importance) * 90}%`,
+        left: `${(event.urgency) * 90}%`,
         width: `${tileSize}px`,
         height: `${tileSize}px`,
         backgroundColor: event.color,
