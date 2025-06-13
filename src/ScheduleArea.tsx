@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import './ScheduleArea.css';
 import EventTile from './EventTile';
 import { CustomButton } from './Buttons';
 import { type Event, EventManager, initialEvents } from './EventManager';
-import './ScheduleArea.css';
+import { dataManager } from './data/dataManager';
 
 const ScheduleArea: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -10,11 +11,30 @@ const ScheduleArea: React.FC = () => {
   const [tempEvent, setTempEvent] = useState<Partial<Event> | null>(null);
   const [eventManager] = useState<EventManager>(() => new EventManager(initialEvents));
   const [events, setEvents] = useState<Event[]>([]);
+  const environmentInfo = dataManager.getEnvironmentInfo();
 
   // 当事件管理器中的数据变化时更新状态
+  // useEffect(() => {
+  //   setEvents(eventManager.getAllEvents());
+  // }, [eventManager]);
+
+  // 组件挂载时加载数据并设置监听器
   useEffect(() => {
-    setEvents(eventManager.getAllEvents());
-  }, [eventManager]);
+    // 初始加载数据
+    setEvents(dataManager.getEvents());
+
+    // 添加数据变化监听器
+    const handleDataChange = (newEvents: Event[]) => {
+      setEvents(newEvents);
+    };
+
+    dataManager.addListener(handleDataChange);
+
+    // 清理函数：移除监听器
+    return () => {
+      dataManager.removeListener(handleDataChange);
+    };
+  }, []);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -102,6 +122,7 @@ const ScheduleArea: React.FC = () => {
           <input type="text" className="command-input" placeholder="请输入指令" />
           <CustomButton width="5vw">执行</CustomButton>
         </span>
+
         {/* 新建日程按钮 */}
         <CustomButton
           width="10vw"
@@ -109,6 +130,21 @@ const ScheduleArea: React.FC = () => {
         >
           ➕ 新建日程
         </CustomButton>
+
+        {/* 环境信息显示 */}
+        <div style={{
+          marginLeft: 'auto',
+          fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+          color: '#666',
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}>
+          环境: {environmentInfo.isProduction ? '生产' : '开发'} |
+          数据持久化: {environmentInfo.dataPersistence ? '开启' : '关闭'}
+        </div>
+
       </div>
 
       <div className="content-area">
