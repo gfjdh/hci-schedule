@@ -1,0 +1,126 @@
+/* 环境指示器样式 */
+.environment-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 999;
+}
+
+.env-badge {
+  background: #ff9800;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.debug-toggle-btn {
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.debug-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* 语音控制区域样式 */
+.voice-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 10px 1rem;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.command {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.command-label {
+  font-weight: 500;
+  color: #333;
+  min-width: 40px;
+}
+
+.command-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.command-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.command-input::placeholder {
+  color: #999;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .voice-area {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .command {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .command-label {
+    min-width: auto;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .voice-area {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .command-input {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+}

@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EventTile from './EventTile';
-import { CustomButton } from './Buttons';
 import { type Event, EventManager, initialEvents } from './EventManager';
+import { useVoiceRecognition } from './hooks/useVoiceRecognition';
+import { VoiceDebugPanel } from './components/VoiceDebugPanel';
+import { VoiceControlArea } from './components/VoiceControlArea';
 import './ScheduleArea.css';
 
 const ScheduleArea: React.FC = () => {
@@ -10,315 +12,28 @@ const ScheduleArea: React.FC = () => {
   const [tempEvent, setTempEvent] = useState<Partial<Event> | null>(null);
   const [eventManager] = useState<EventManager>(() => new EventManager(initialEvents));
   const [events, setEvents] = useState<Event[]>([]);
-  
-  // 语音识别相关状态
-  const [isListening, setIsListening] = useState(false);
-  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
   const [commandInput, setCommandInput] = useState('');
-  const [speechSupported, setSpeechSupported] = useState(false);
-  const [speechError, setSpeechError] = useState<string>('');
-  const [lastRecognizedText, setLastRecognizedText] = useState<string>('');
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [debugPanelVisible, setDebugPanelVisible] = useState(false);
-  const [debugPanelPosition, setDebugPanelPosition] = useState({ x: 10, y: 60 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [microphonePermission, setMicrophonePermission] = useState<string>('unknown');
-  const [audioLevel, setAudioLevel] = useState<number>(0);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   
   // 环境检测
   const isDevelopment = import.meta.env.VITE_APP_ENV === 'development' || import.meta.env.DEV;
-  
-  // 添加调试日志函数
-  const addDebugLog = (message: string) => {
-    if (isDevelopment) {
-      const timestamp = new Date().toLocaleTimeString();
-      const logMessage = `[${timestamp}] ${message}`;
-      setDebugInfo(prev => [...prev.slice(-4), logMessage]); // 保留最近5条日志
-      console.log('🎤 语音调试:', logMessage);
-    }
-  };
 
   // 当事件管理器中的数据变化时更新状态
   useEffect(() => {
     setEvents(eventManager.getAllEvents());
   }, [eventManager]);
 
-  // 清理媒体流
-  useEffect(() => {
-    return () => {
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        addDebugLog('媒体流已清理');
-      }
-    };
-  }, [mediaStream]);
-
-  // 检测麦克风权限和音频输入
-  const checkMicrophoneAccess = async () => {
-    try {
-      addDebugLog('检测麦克风权限...');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMicrophonePermission('granted');
-      setMediaStream(stream);
-      addDebugLog('麦克风权限已获取，开始监控音频级别');
-      
-      // 创建音频分析器来监控音频级别
-      const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const microphone = audioContext.createMediaStreamSource(stream);
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      
-      microphone.connect(analyser);
-      analyser.fftSize = 256;
-      
-      const updateAudioLevel = () => {
-        analyser.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        setAudioLevel(Math.round(average));
-        
-        if (mediaStream && mediaStream.active) {
-          requestAnimationFrame(updateAudioLevel);
-        }
-      };
-      
-      updateAudioLevel();
-    } catch (error) {
-      setMicrophonePermission('denied');
-      addDebugLog(`麦克风权限检测失败: ${error}`);
-    }
-  };
-
-  // 初始化语音识别
-  useEffect(() => {
-    addDebugLog('开始初始化语音识别模块');
-    
-    // 检测麦克风权限
-    checkMicrophoneAccess();
-    
-    // 检测浏览器支持
-    const hasWebkitSpeech = 'webkitSpeechRecognition' in window;
-    const hasSpeech = 'SpeechRecognition' in window;
-    
-    addDebugLog(`浏览器支持检测: webkitSpeechRecognition=${hasWebkitSpeech}, SpeechRecognition=${hasSpeech}`);
-    
-    if (hasWebkitSpeech || hasSpeech) {
-      try {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'zh-CN';
-        
-        addDebugLog('语音识别对象创建成功，配置: continuous=false, lang=zh-CN');
-        
-        recognition.onstart = () => {
-          setIsListening(true);
-          setSpeechError('');
-          addDebugLog('语音识别开始监听');
-        };
-        
-        recognition.onresult = (event) => {
-          let finalTranscript = '';
-          let interimTranscript = '';
-          
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-          
-          // 更新显示的文本（包括中间结果）
-          const displayText = finalTranscript + interimTranscript;
-          setLastRecognizedText(displayText);
-          setCommandInput(displayText);
-          
-          // 只有最终结果才处理命令
-          if (finalTranscript) {
-            const confidence = event.results[event.resultIndex][0].confidence;
-            addDebugLog(`最终识别结果: "${finalTranscript}" (置信度: ${confidence.toFixed(2)})`);
-            processVoiceCommand(finalTranscript);
-          } else if (interimTranscript) {
-            addDebugLog(`中间识别结果: "${interimTranscript}"`);
-          }
-        };
-        
-        recognition.onend = () => {
-          // 在持续监听模式下，只有手动停止才设置为false
-          if (!isListening) {
-            addDebugLog('语音识别已结束');
-          } else {
-            addDebugLog('语音识别意外结束，尝试重新启动');
-            // 如果是意外结束且仍在监听状态，尝试重新启动
-            setTimeout(() => {
-              if (isListening && speechRecognition) {
-                try {
-                  speechRecognition.start();
-                  addDebugLog('语音识别已重新启动');
-                } catch (error) {
-                  addDebugLog(`重新启动失败: ${error}`);
-                  setIsListening(false);
-                }
-              }
-            }, 100);
-          }
-        };
-        
-        recognition.onerror = (event) => {
-          let errorMsg = `语音识别错误: ${event.error}`;
-          let suggestion = '';
-          
-          // 针对不同错误类型提供具体建议
-          switch (event.error) {
-            case 'no-speech':
-              suggestion = '未检测到语音输入。请确保：1) 麦克风权限已授权 2) 麦克风工作正常 3) 说话声音足够大 4) 环境噪音不要太大';
-              break;
-            case 'audio-capture':
-              suggestion = '无法访问麦克风。请检查麦克风权限和设备连接';
-              break;
-            case 'not-allowed':
-              suggestion = '麦克风权限被拒绝。请在浏览器设置中允许麦克风访问';
-              break;
-            case 'network':
-              suggestion = '网络错误。请检查网络连接';
-              break;
-            case 'service-not-allowed':
-              suggestion = '语音识别服务不可用。请稍后重试';
-              break;
-            default:
-              suggestion = '未知错误，请重试';
-          }
-          
-          errorMsg += ` | 建议: ${suggestion}`;
-          setSpeechError(errorMsg);
-          
-          // 某些错误不需要停止监听状态（如no-speech），让用户手动控制
-          if (event.error === 'not-allowed' || event.error === 'service-not-allowed' || event.error === 'audio-capture') {
-            setIsListening(false);
-          }
-          
-          addDebugLog(errorMsg);
-          console.error('🎤 语音识别错误详情:', event);
-        };
-        
-        setSpeechRecognition(recognition);
-        setSpeechSupported(true);
-        addDebugLog('语音识别模块初始化完成');
-      } catch (error) {
-        const errorMsg = `语音识别初始化失败: ${error}`;
-        setSpeechError(errorMsg);
-        addDebugLog(errorMsg);
-        console.error('🎤 语音识别初始化错误:', error);
-      }
-    } else {
-      const errorMsg = '浏览器不支持语音识别功能';
-      setSpeechError(errorMsg);
-      addDebugLog(errorMsg);
-    }
-  }, []);
-
-  // 处理语音命令
-  const processVoiceCommand = (command: string) => {
-    const lowerCommand = command.toLowerCase();
-    addDebugLog(`处理语音命令: "${command}"`);
-    
-    if (lowerCommand.includes('新建') || lowerCommand.includes('添加') || lowerCommand.includes('创建')) {
-      addDebugLog('执行命令: 新建事件');
-      handleAddEvent();
-    } else if (lowerCommand.includes('删除') && selectedEvent) {
-      addDebugLog('执行命令: 删除事件');
-      handleDeleteEvent();
-    } else if (lowerCommand.includes('编辑') && selectedEvent) {
-      addDebugLog('执行命令: 编辑事件');
-      handleEditToggle();
-    } else if (lowerCommand.includes('保存') && isEditing) {
-      addDebugLog('执行命令: 保存编辑');
-      handleSaveEdit();
-    } else {
-      addDebugLog('未匹配到命令，文本已填入输入框');
-      // 如果没有匹配的命令，将语音文本填入命令输入框
-      setCommandInput(command);
-    }
-  };
-
-  // 拖动相关函数
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - debugPanelPosition.x,
-      y: e.clientY - debugPanelPosition.y
-    });
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setDebugPanelPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // 添加全局鼠标事件监听
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, dragOffset]);
-
-  // 切换语音识别状态
-  const toggleVoiceRecognition = () => {
-    if (!speechSupported) {
-      addDebugLog('语音识别不支持，无法启动');
-      return;
-    }
-    
-    if (!speechRecognition) {
-      addDebugLog('语音识别对象未初始化');
-      return;
-    }
-    
-    if (isListening) {
-      // 停止语音识别
-      try {
-        addDebugLog('停止语音识别');
-        setIsListening(false);
-        speechRecognition.stop();
-        setSpeechError('');
-      } catch (error) {
-        const errorMsg = `停止语音识别失败: ${error}`;
-        setSpeechError(errorMsg);
-        addDebugLog(errorMsg);
-      }
-    } else {
-      // 开始语音识别
-      try {
-        addDebugLog('启动语音识别');
-        setLastRecognizedText('');
-        setCommandInput('');
-        setSpeechError('');
-        speechRecognition.start();
-      } catch (error) {
-        const errorMsg = `启动语音识别失败: ${error}`;
-        setSpeechError(errorMsg);
-        addDebugLog(errorMsg);
-      }
-    }
-  };
+  // 语音识别功能
+  const { voiceState, debugInfo, toggleVoiceRecognition } = useVoiceRecognition({
+    isDevelopment,
+    onAddEvent: () => handleAddEvent(),
+    onDeleteEvent: () => handleDeleteEvent(),
+    onEditEvent: () => handleEditToggle(),
+    onSaveEdit: () => handleSaveEdit(),
+    onTextInput: (text: string) => setCommandInput(text),
+    hasSelectedEvent: !!selectedEvent,
+    isEditing
+  });
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -418,133 +133,25 @@ const ScheduleArea: React.FC = () => {
 
   return (
     <div className="schedule-container">
-      {/* 环境指示器 - 仅在开发环境显示 */}
-      {isDevelopment && (
-        <div className="environment-indicator">
-          <span className="env-badge">开发环境</span>
-          <button 
-            className="debug-toggle-btn"
-            onClick={() => setDebugPanelVisible(!debugPanelVisible)}
-            title={debugPanelVisible ? '关闭调试面板' : '打开调试面板'}
-          >
-            🔧
-          </button>
-        </div>
-      )}
+      {/* 语音控制区域 */}
+      <VoiceControlArea
+        voiceState={voiceState}
+        commandInput={commandInput}
+        onCommandInputChange={setCommandInput}
+        onToggleVoice={toggleVoiceRecognition}
+        onAddEvent={handleAddEvent}
+        isDevelopment={isDevelopment}
+        onToggleDebugPanel={() => setDebugPanelVisible(!debugPanelVisible)}
+      />
       
-      {/* 语音调试面板 - 仅在开发环境显示 */}
-      {isDevelopment && debugPanelVisible && (
-        <div 
-          className="speech-debug-panel"
-          style={{
-            left: `${debugPanelPosition.x}px`,
-            top: `${debugPanelPosition.y}px`,
-            cursor: isDragging ? 'grabbing' : 'default'
-          }}
-        >
-          <div 
-            className="debug-header"
-            onMouseDown={handleMouseDown}
-            style={{ cursor: 'grab' }}
-          >
-            🎤 语音调试信息
-            <button 
-              className="debug-close-btn"
-              onClick={() => setDebugPanelVisible(false)}
-              title="关闭调试面板"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="debug-status">
-            <div className="status-item">
-              <span className="status-label">支持状态:</span>
-              <span className={`status-value ${speechSupported ? 'success' : 'error'}`}>
-                {speechSupported ? '✅ 支持' : '❌ 不支持'}
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">监听状态:</span>
-              <span className={`status-value ${isListening ? 'listening' : 'idle'}`}>
-                {isListening ? '🔴 监听中' : '⚪ 空闲'}
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">麦克风权限:</span>
-              <span className={`status-value ${microphonePermission === 'granted' ? 'success' : microphonePermission === 'denied' ? 'error' : 'warning'}`}>
-                {microphonePermission === 'granted' ? '✅ 已授权' : 
-                 microphonePermission === 'denied' ? '❌ 被拒绝' : '⚠️ 未知'}
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">音频级别:</span>
-              <span className="status-value">
-                <span className="audio-level-bar">
-                  <span 
-                    className="audio-level-fill" 
-                    style={{ width: `${Math.min(audioLevel * 2, 100)}%` }}
-                  ></span>
-                </span>
-                <span className="audio-level-text">{audioLevel}</span>
-              </span>
-            </div>
-            {speechError && (
-              <div className="status-item">
-                <span className="status-label">错误信息:</span>
-                <span className="status-value error">{speechError}</span>
-              </div>
-            )}
-            {lastRecognizedText && (
-              <div className="status-item">
-                <span className="status-label">最后识别:</span>
-                <span className="status-value">"{lastRecognizedText}"</span>
-              </div>
-            )}
-          </div>
-          <div className="debug-logs">
-            <div className="logs-header">调试日志:</div>
-            <div className="logs-content">
-              {debugInfo.map((log, index) => (
-                <div key={index} className="log-item">{log}</div>
-              ))}
-              {debugInfo.length === 0 && (
-                <div className="log-item empty">暂无日志</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <div className="voice-area">
-        <CustomButton 
-          width="8vw" 
-          onClick={toggleVoiceRecognition}
-          style={{
-            backgroundColor: isListening ? '#ff6b6b' : '#4CAF50',
-            animation: isListening ? 'pulse 1s infinite' : undefined
-          }}
-        >
-          🎤 {isListening ? '停止监听' : '开始监听'}
-        </CustomButton>
-        <span className="command">
-          <label className="command-label">指令</label>
-          <input 
-            type="text" 
-            className="command-input" 
-            placeholder="请输入指令或使用语音输入" 
-            value={commandInput}
-            onChange={(e) => setCommandInput(e.target.value)}
-          />
-          <CustomButton width="5vw">执行</CustomButton>
-        </span>
-        {/* 新建日程按钮 */}
-        <CustomButton
-          width="10vw"
-          onClick={handleAddEvent}
-        >
-          ➕ 新建日程
-        </CustomButton>
-      </div>
+      {/* 语音调试面板 */}
+      <VoiceDebugPanel
+        voiceState={voiceState}
+        debugInfo={debugInfo}
+        visible={debugPanelVisible}
+        onClose={() => setDebugPanelVisible(false)}
+        isDevelopment={isDevelopment}
+      />
 
       <div className="content-area">
         <div className="quadrant-view">
