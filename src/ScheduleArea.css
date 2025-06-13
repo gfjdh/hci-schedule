@@ -16,6 +16,9 @@
   right: 10px;
   z-index: 1000;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .env-badge {
@@ -25,8 +28,26 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.822);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
   animation: envPulse 2s ease-in-out infinite;
+}
+
+.debug-toggle-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.debug-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 @keyframes envPulse {
@@ -48,12 +69,193 @@
   }
   70% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
   }
   100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
   }
+}
+
+/* 语音调试面板样式 */
+.speech-debug-panel {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  font-size: 0.85rem;
+  backdrop-filter: blur(10px);
+}
+
+.debug-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 12px 12px 0 0;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.debug-close-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.debug-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* 音频级别条样式 */
+.audio-level-bar {
+  display: inline-block;
+  width: 60px;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-right: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.audio-level-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50 0%, #FFC107 50%, #F44336 100%);
+  border-radius: 4px;
+  transition: width 0.1s ease;
+}
+
+.audio-level-text {
+  font-size: 11px;
+  color: #666;
+  min-width: 20px;
+  display: inline-block;
+}
+
+.status-value.warning {
+  color: #ff9800;
+}
+
+.debug-status {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.status-value {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.status-value.success {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status-value.error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-value.listening {
+  background: #fff3e0;
+  color: #ef6c00;
+  animation: blink 1s infinite;
+}
+
+.status-value.idle {
+  background: #f5f5f5;
+  color: #757575;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.5; }
+}
+
+.debug-logs {
+  padding: 12px 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.logs-header {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.logs-content {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.log-item {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #444;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  word-break: break-all;
+}
+
+.log-item:last-child {
+  margin-bottom: 0;
+}
+
+.log-item.empty {
+  color: #999;
+  font-style: italic;
+  text-align: center;
 }
 
 .voice-area {
