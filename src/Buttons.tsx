@@ -5,6 +5,7 @@ interface CustomButtonProps {
   width?: string;
   spacing?: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 export const CustomButton = ({
@@ -12,12 +13,14 @@ export const CustomButton = ({
   width = "80px",
   spacing = "8px",
   onClick,
+  style,
 }: CustomButtonProps) => {
   return (
     <button
       style={{
         width,
         marginRight: spacing,
+        ...style,
       }}
       className="button"
       onClick={onClick}

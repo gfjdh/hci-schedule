@@ -10,11 +10,65 @@ const ScheduleArea: React.FC = () => {
   const [tempEvent, setTempEvent] = useState<Partial<Event> | null>(null);
   const [eventManager] = useState<EventManager>(() => new EventManager(initialEvents));
   const [events, setEvents] = useState<Event[]>([]);
+  
+  // 语音识别相关状态
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
+  const [commandInput, setCommandInput] = useState('');
+  
+  // 环境检测
+  const isDevelopment = import.meta.env.VITE_APP_ENV === 'development' || import.meta.env.DEV;
 
   // 当事件管理器中的数据变化时更新状态
   useEffect(() => {
     setEvents(eventManager.getAllEvents());
   }, [eventManager]);
+
+  // 初始化语音识别
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'zh-CN';
+      
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setCommandInput(transcript);
+        processVoiceCommand(transcript);
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('语音识别错误:', event.error);
+        setIsListening(false);
+      };
+      
+      setSpeechRecognition(recognition);
+    }
+  }, []);
+
+  // 处理语音命令
+  const processVoiceCommand = (command: string) => {
+    // 直接将语音识别的内容放入输入框
+    setCommandInput(command);
+  };
+
+  // 开始语音识别
+  const startVoiceRecognition = () => {
+    if (speechRecognition && !isListening) {
+      speechRecognition.start();
+    }
+  };
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -95,11 +149,33 @@ const ScheduleArea: React.FC = () => {
 
   return (
     <div className="schedule-container">
+      {/* 环境指示器 - 仅在开发环境显示 */}
+      {isDevelopment && (
+        <div className="environment-indicator">
+          <span className="env-badge">开发环境</span>
+        </div>
+      )}
+      
       <div className="voice-area">
-        <CustomButton width="8vw">🎤 语音输入</CustomButton>
+        <CustomButton 
+          width="8vw" 
+          onClick={startVoiceRecognition}
+          style={{
+            backgroundColor: isListening ? '#ff6b6b' : undefined,
+            animation: isListening ? 'pulse 1s infinite' : undefined
+          }}
+        >
+          🎤 {isListening ? '正在听...' : '语音输入'}
+        </CustomButton>
         <span className="command">
           <label className="command-label">指令</label>
-          <input type="text" className="command-input" placeholder="请输入指令" />
+          <input 
+            type="text" 
+            className="command-input" 
+            placeholder="请输入指令或使用语音输入" 
+            value={commandInput}
+            onChange={(e) => setCommandInput(e.target.value)}
+          />
           <CustomButton width="5vw">执行</CustomButton>
         </span>
         {/* 新建日程按钮 */}
