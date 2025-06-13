@@ -12,21 +12,25 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 24px;
-  padding: 10px 0;
-  /* 添加上下内边距 */
+  padding: 10px 1rem;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .content-area {
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 .quadrant-view {
   flex: 1;
   position: relative;
   overflow: hidden;
-  padding: 60px;
+  padding: clamp(20px, 5vw, 60px);
+  min-width: 0;
 }
 
 .quadrants {
@@ -95,18 +99,21 @@
 }
 
 .axis-label-x {
-  right: -20px;
+  right: 10px;
   bottom: 45%;
   transform: translateX(-50%);
 }
 
 .sidebar {
-  width: 300px;
+  width: clamp(250px, 30vw, 350px);
+  max-width: 350px;
+  min-width: 250px;
   background-color: white;
   border-left: 1px solid #dee2e6;
   padding: 20px;
   overflow-y: auto;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .event-details h3 {
@@ -144,4 +151,71 @@
   border-radius: 50%;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+  }
+  
+  .quadrant-view {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-area {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+    height: 40vh;
+    border-left: none;
+    border-top: 1px solid #dee2e6;
+    order: 2;
+  }
+  
+  .quadrant-view {
+    order: 1;
+    padding: 20px;
+  }
+  
+  .voice-area {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 1rem;
+  }
+  
+  .axis-label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quadrant-view {
+    padding: 10px;
+  }
+  
+  .sidebar {
+    height: 35vh;
+    padding: 15px;
+  }
+  
+  .axis-label {
+    font-size: 0.8rem;
+  }
+  
+  .detail-label {
+    font-size: 0.8rem;
+  }
+  
+  .detail-value {
+    font-size: 0.9rem;
+    padding: 6px;
+  }
 }

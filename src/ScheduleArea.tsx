@@ -1,89 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './ScheduleArea.css';
 import EventTile from './EventTile';
 import { CustomButton } from './Buttons';
-import './ScheduleArea.css';
-
-interface Event {
-  id: string;
-  name: string;
-  size: number;
-  color: string;
-  importance: number;
-  urgency: number;
-  startTime: string;
-  endTime: string;
-  details?: {
-    location?: string;
-    notes?: string;
-    estimatedHours?: number;
-  };
-}
+import type { Event } from './data/dataManager';
+import { dataManager } from './data/dataManager';
 
 const ScheduleArea: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const environmentInfo = dataManager.getEnvironmentInfo();
 
-  // 示例事件数据
-  const events: Event[] = [
-    {
-      id: 'evt_001',
-      name: '项目汇报',
-      size: 80,
-      color: '#ff6b6b',
-      importance: 0.85,
-      urgency: 0.9,
-      startTime: '2025-06-20 14:00',
-      endTime: '2025-06-20 16:00',
-      details: {
-        location: '会议室A',
-        notes: '准备PPT和演示材料',
-        estimatedHours: 2
-      }
-    },
-    {
-      id: 'evt_002',
-      name: '团队周会',
-      size: 60,
-      color: '#4ecdc4',
-      importance: 0.7,
-      urgency: 0.6,
-      startTime: '2025-06-18 10:00',
-      endTime: '2025-06-18 11:30',
-      details: {
-        location: '线上会议',
-        notes: '审查项目进度'
-      }
-    },
-    {
-      id: 'evt_003',
-      name: '文档整理',
-      size: 40,
-      color: '#ffe66d',
-      importance: 0.4,
-      urgency: 0.3,
-      startTime: '2025-06-19 09:00',
-      endTime: '2025-06-19 12:00',
-    },
-    {
-      id: 'evt_004',
-      name: 'max',
-      size: 40,
-      color: '#ffe66d',
-      importance: 1,
-      urgency: 1,
-      startTime: '2025-06-19 09:00',
-      endTime: '2025-06-19 12:00',
-    },
-    {
-      id: 'evt_005',
-      name: 'min',
-      size: 40,
-      color: '#ffe66d',
-      importance: 0,
-      urgency: 0,
-      startTime: '2025-06-19 09:00',
-      endTime: '2025-06-19 12:00',
-    },
-  ];
+  // 组件挂载时加载数据并设置监听器
+  useEffect(() => {
+    // 初始加载数据
+    setEvents(dataManager.getEvents());
+
+    // 添加数据变化监听器
+    const handleDataChange = (newEvents: Event[]) => {
+      setEvents(newEvents);
+    };
+
+    dataManager.addListener(handleDataChange);
+
+    // 清理函数：移除监听器
+    return () => {
+      dataManager.removeListener(handleDataChange);
+    };
+  }, []);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -98,6 +41,19 @@ const ScheduleArea: React.FC = () => {
           <input type="text" className="command-input" placeholder="请输入指令" />
           <CustomButton width="5vw">执行</CustomButton>
         </span>
+        {/* 环境信息显示 */}
+        <div style={{
+          marginLeft: 'auto',
+          fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+          color: '#666',
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}>
+          环境: {environmentInfo.isProduction ? '生产' : '开发'} |
+          数据持久化: {environmentInfo.dataPersistence ? '开启' : '关闭'}
+        </div>
       </div>
       <div className="content-area">
         <div className="quadrant-view">
