@@ -570,18 +570,20 @@ const ScheduleArea: React.FC = () => {
             <div className="event-details">
               {/* 事件标题和操作按钮 */}
               <div className="detail-header">
-                <h3>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={tempEvent?.name || ''}
-                      onChange={(e) => handleFieldChange('name', e.target.value)}
-                      className="edit-input"
-                    />
-                  ) : (
-                    selectedEvent.name
-                  )}
-                </h3>
+                <div>
+                  <h3>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={tempEvent?.name || ''}
+                        onChange={(e) => handleFieldChange('name', e.target.value)}
+                        className="edit-input"
+                      />
+                    ) : (
+                      selectedEvent.name
+                    )}
+                  </h3>
+                </div>
 
                 <div className="action-buttons">
                   {isEditing ? (
@@ -599,14 +601,14 @@ const ScheduleArea: React.FC = () => {
               <div className="detail-item">
                 <span className="detail-label">时间</span>
                 {isEditing ? (
-                  <div className="edit-fields">
+                  <div className="edit-fields-time">
                     <input
                       type="datetime-local"
                       value={tempEvent?.startTime?.substring(0, 16) || ''}
                       onChange={(e) => handleFieldChange('startTime', e.target.value)}
                       className="edit-input"
                     />
-                    <span>至</span>
+                    <div>至</div>
                     <input
                       type="datetime-local"
                       value={tempEvent?.endTime?.substring(0, 16) || ''}
@@ -649,6 +651,7 @@ const ScheduleArea: React.FC = () => {
               {/* 重要性字段 */}
               <div className="detail-item">
                 <span className="detail-label">重要性</span>
+                <div className="detail-value">
                 {isEditing ? (
                   <div className="edit-fields">
                     <input
@@ -667,6 +670,7 @@ const ScheduleArea: React.FC = () => {
                     {selectedEvent.importance > 0.7 ? '高' : selectedEvent.importance > 0.4 ? '中' : '低'}
                   </div>
                 )}
+                </div>
               </div>
 
               {/* 剩余工作量字段 */}

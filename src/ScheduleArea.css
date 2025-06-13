@@ -408,7 +408,6 @@
 
 /* 二期css */
 .detail-header {
-  display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
@@ -455,7 +454,12 @@
 }
 
 .edit-fields {
+  align-items: center;
+  gap: 8px;
   display: flex;
+}
+
+.edit-fields-time {
   align-items: center;
   gap: 8px;
 }
@@ -467,8 +471,8 @@
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .sidebar {
-    width: 280px;
-    min-width: 280px;
+    width: 300px;
+    min-width: 300px;
   }
   
   .quadrant-view {
@@ -530,3 +534,5 @@
     padding: 6px;
   }
 }
+
+
