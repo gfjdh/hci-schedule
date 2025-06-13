@@ -46,3 +46,63 @@
     letter-spacing: 0.2rem;
   }
 }
+
+/* 设置和帮助页 */
+.settings-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.setting-item {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #21609e;
+  border-radius: 8px;
+}
+
+.setting-item label {
+  display: inline-block;
+  width: 120px;
+  font-weight: bold;
+}
+
+.setting-item input[type="text"],
+.setting-item select {
+  padding: 8px;
+  width: 250px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.setting-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.save-message {
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 15px;
+}
+
+.help-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.help-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.help-footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #6c757d;
+}

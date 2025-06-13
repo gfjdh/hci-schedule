@@ -29,15 +29,18 @@ export const CustomButton = ({
     </button>
   );
 };
+interface ButtonsProps {
+  onPageChange: (page: 'home' | 'settings' | 'help') => void;
+}
 
-function Buttons() {
+function Buttons({ onPageChange }: ButtonsProps) {
   return (
     <>
     <div className="buttons">
       <span className="configBtn">
-        <CustomButton width="8vw">🏠主页</CustomButton>
-        <CustomButton width="8vw">⚙设置</CustomButton>
-        <CustomButton width="8vw">❓帮助</CustomButton>
+        <CustomButton width="8vw" onClick={() => onPageChange('home')}>🏠主页</CustomButton>
+        <CustomButton width="8vw" onClick={() => onPageChange('settings')}>⚙设置</CustomButton>
+        <CustomButton width="8vw" onClick={() => onPageChange('help')}>❓帮助</CustomButton>
       </span>
     </div>
   </>
