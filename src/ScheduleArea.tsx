@@ -325,14 +325,29 @@ const ScheduleArea: React.FC = () => {
     setIsEditing(false);
   };
 
+  function calcEventColor(importance: number, urgency: number) {
+    // importance, urgency ∈ [0,1]
+    // 计算权重，越大越红，越小越蓝
+    const weight = (importance + urgency) / 2;
+    // hue: 220(蓝) → 0(红)
+    const hue = 220 - 220 * weight;
+    // 饱和度和亮度可微调
+    const saturation = 80;
+    const lightness = 55 - 20 * weight; // 越重要越暗
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
+
   const handleAddEvent = () => {
+    const importance = 0.5;
+    const urgency = 0.5;
+    const color = calcEventColor(importance, urgency);
     const newEvent: Event = {
       id: `evt_${Date.now()}`,
       name: '新事件',
       size: 50,
-      color: '#a5d8ff',
-      importance: 0.5,
-      urgency: 0.5,
+      color,
+      importance,
+      urgency,
       startTime: new Date().toISOString(),
       endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
       details: {}
@@ -378,10 +393,14 @@ const ScheduleArea: React.FC = () => {
 
   const handleFieldChange = (field: keyof Event, value: any) => {
     if (tempEvent) {
-      setTempEvent({
-        ...tempEvent,
-        [field]: value
-      });
+      const updated = { ...tempEvent, [field]: value };
+      // 如果改的是重要性或紧迫性，自动更新颜色
+      if (field === 'importance' || field === 'urgency') {
+        const importance = field === 'importance' ? value : updated.importance ?? 0.5;
+        const urgency = field === 'urgency' ? value : updated.urgency ?? 0.5;
+        updated.color = calcEventColor(importance, urgency);
+      }
+      setTempEvent(updated);
     }
   };
 
