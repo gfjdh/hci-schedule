@@ -41,7 +41,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 24px;
+  margin-top: -8px;
+  margin-bottom: -8px;
   padding: 10px 1rem;
   box-sizing: border-box;
   flex-wrap: wrap;

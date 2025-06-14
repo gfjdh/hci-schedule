@@ -30,7 +30,7 @@ const ScheduleArea: React.FC = () => {
     onDeleteEvent: () => handleDeleteEvent(),
     onEditEvent: () => handleEditToggle(),
     onSaveEdit: () => handleSaveEdit(),
-    onTextInput: (text: string) => setCommandInput(text),
+    onTextInput: (text: string) => setCommandInput(prev => prev + text),
     hasSelectedEvent: !!selectedEvent,
     isEditing
   });

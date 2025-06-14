@@ -307,23 +307,8 @@ export class VoiceCommandProcessor {
     this.callbacks = callbacks;
   }
 
-  public processCommand(command: string, context: {
-    hasSelectedEvent: boolean;
-    isEditing: boolean;
-  }): void {
-    const lowerCommand = command.toLowerCase();
-    
-    if (lowerCommand.includes('新建') || lowerCommand.includes('添加') || lowerCommand.includes('创建')) {
-      this.callbacks.onAddEvent?.();
-    } else if (lowerCommand.includes('删除') && context.hasSelectedEvent) {
-      this.callbacks.onDeleteEvent?.();
-    } else if (lowerCommand.includes('编辑') && context.hasSelectedEvent) {
-      this.callbacks.onEditEvent?.();
-    } else if (lowerCommand.includes('保存') && context.isEditing) {
-      this.callbacks.onSaveEdit?.();
-    } else {
-      // 如果没有匹配的命令，将语音文本作为输入
-      this.callbacks.onTextInput?.(command);
-    }
+  public processCommand(command: string): void {
+    // 将语音文本追加到输入框
+    this.callbacks.onTextInput?.(command);
   }
 }

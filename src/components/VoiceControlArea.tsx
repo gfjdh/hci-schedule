@@ -65,11 +65,9 @@ export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
             value={commandInput}
             onChange={(e) => onCommandInputChange(e.target.value)}
           />
-          {onExecuteCommand && (
-            <CustomButton width="5vw" onClick={onExecuteCommand}>
-              执行
-            </CustomButton>
-          )}
+          <CustomButton width="5vw" onClick={onExecuteCommand || (() => {})}>
+            执行
+          </CustomButton>
         </span>
         
         {/* 新建日程按钮 */}

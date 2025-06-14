@@ -56,7 +56,7 @@ export const useVoiceRecognition = (options: UseVoiceRecognitionOptions = {}): U
   // 添加调试日志
   const addDebugLog = useCallback((message: string) => {
     if (isDevelopment) {
-      setDebugInfo(prev => [...prev.slice(-4), message]); // 保留最近5条日志
+      setDebugInfo(prev => [...prev.slice(-14), message]); // 保留最近15条日志
     }
   }, [isDevelopment]);
 
@@ -68,10 +68,7 @@ export const useVoiceRecognition = (options: UseVoiceRecognitionOptions = {}): U
   // 处理语音命令
   const handleCommand = useCallback((command: string) => {
     if (commandProcessorRef.current) {
-      commandProcessorRef.current.processCommand(command, {
-        hasSelectedEvent,
-        isEditing
-      });
+      commandProcessorRef.current.processCommand(command);
     }
   }, [hasSelectedEvent, isEditing]);
 
