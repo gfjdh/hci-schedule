@@ -2,6 +2,7 @@ import React from 'react';
 import { CustomButton } from '../Buttons';
 import type { VoiceRecognitionState } from '../VoiceRecognition';
 import './VoiceControlArea.css';
+import './DebugIndicator.css';
 
 export interface VoiceControlAreaProps {
   voiceState: VoiceRecognitionState;
@@ -12,6 +13,7 @@ export interface VoiceControlAreaProps {
   onAddEvent: () => void;
   isDevelopment?: boolean;
   onToggleDebugPanel?: () => void;
+  onToggleApiDebugPanel?: () => void;
 }
 
 export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
@@ -22,7 +24,8 @@ export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
   onExecuteCommand,
   onAddEvent,
   isDevelopment = false,
-  onToggleDebugPanel
+  onToggleDebugPanel,
+  onToggleApiDebugPanel
 }) => {
   const { isListening } = voiceState;
 
@@ -36,9 +39,18 @@ export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
             <button 
               className="debug-toggle-btn"
               onClick={onToggleDebugPanel}
-              title="切换调试面板"
+              title="切换语音调试面板"
             >
-              🔧
+              语音调试
+            </button>
+          )}
+          {onToggleApiDebugPanel && (
+            <button 
+              className="debug-toggle-btn api-debug-btn"
+              onClick={onToggleApiDebugPanel}
+              title="切换API调试面板"
+            >
+              API调试
             </button>
           )}
         </div>
