@@ -5,6 +5,7 @@ import { useVoiceRecognition } from './hooks/useVoiceRecognition';
 import { VoiceDebugPanel } from './components/VoiceDebugPanel';
 import { VoiceControlArea } from './components/VoiceControlArea';
 import { ApiDebugPanel } from './components/ApiDebugPanel';
+import { ScheduleDebugPanel } from './components/ScheduleDebugPanel';
 import './ScheduleArea.css';
 
 const ScheduleArea: React.FC = () => {
@@ -16,6 +17,7 @@ const ScheduleArea: React.FC = () => {
   const [commandInput, setCommandInput] = useState('');
   const [debugPanelVisible, setDebugPanelVisible] = useState(false);
   const [apiDebugPanelVisible, setApiDebugPanelVisible] = useState(false);
+  const [scheduleDebugPanelVisible, setScheduleDebugPanelVisible] = useState(false);
   
   // 环境检测
   const isDevelopment = import.meta.env.VITE_APP_ENV === 'development' || import.meta.env.DEV;
@@ -145,6 +147,7 @@ const ScheduleArea: React.FC = () => {
         isDevelopment={isDevelopment}
         onToggleDebugPanel={() => setDebugPanelVisible(!debugPanelVisible)}
         onToggleApiDebugPanel={() => setApiDebugPanelVisible(!apiDebugPanelVisible)}
+        onToggleScheduleDebugPanel={() => setScheduleDebugPanelVisible(!scheduleDebugPanelVisible)}
       />
       
       {/* 语音调试面板 */}
@@ -160,6 +163,14 @@ const ScheduleArea: React.FC = () => {
       <ApiDebugPanel
         visible={apiDebugPanelVisible}
         onClose={() => setApiDebugPanelVisible(false)}
+        isDevelopment={isDevelopment}
+      />
+      
+      {/* 日程调试面板 */}
+      <ScheduleDebugPanel
+        events={events}
+        visible={scheduleDebugPanelVisible}
+        onClose={() => setScheduleDebugPanelVisible(false)}
         isDevelopment={isDevelopment}
       />
 

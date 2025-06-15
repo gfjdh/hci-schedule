@@ -14,6 +14,7 @@ export interface VoiceControlAreaProps {
   isDevelopment?: boolean;
   onToggleDebugPanel?: () => void;
   onToggleApiDebugPanel?: () => void;
+  onToggleScheduleDebugPanel?: () => void;
 }
 
 export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
@@ -25,7 +26,8 @@ export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
   onAddEvent,
   isDevelopment = false,
   onToggleDebugPanel,
-  onToggleApiDebugPanel
+  onToggleApiDebugPanel,
+  onToggleScheduleDebugPanel
 }) => {
   const { isListening } = voiceState;
 
@@ -51,6 +53,15 @@ export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
               title="切换API调试面板"
             >
               API调试
+            </button>
+          )}
+          {onToggleScheduleDebugPanel && (
+            <button 
+              className="debug-toggle-btn schedule-debug-btn"
+              onClick={onToggleScheduleDebugPanel}
+              title="切换日程调试面板"
+            >
+              日程调试
             </button>
           )}
         </div>

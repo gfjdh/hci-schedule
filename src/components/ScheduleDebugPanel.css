@@ -1,0 +1,278 @@
+/* 日程调试面板样式 */
+.schedule-debug-panel {
+  position: fixed;
+  top: 60px;
+  left: 10px;
+  width: 400px;
+  max-height: 80vh;
+  background: rgba(33, 33, 33, 0.95);
+  border: 1px solid rgba(156, 39, 176, 0.5);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(156, 39, 176, 0.3);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-debug-panel.dragging {
+  user-select: none;
+  cursor: grabbing;
+}
+
+.schedule-debug-header {
+  background: rgba(156, 39, 176, 0.8);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(156, 39, 176, 0.5);
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.schedule-debug-header:active {
+  cursor: grabbing;
+}
+
+.schedule-debug-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.schedule-debug-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.schedule-debug-content {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(80vh - 50px);
+}
+
+.schedule-debug-section {
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid rgba(156, 39, 176, 0.7);
+}
+
+.schedule-debug-section h4 {
+  margin: 0 0 8px 0;
+  color: #e1bee7;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.schedule-debug-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.schedule-debug-btn {
+  background: rgba(156, 39, 176, 0.6);
+  border: 1px solid rgba(156, 39, 176, 0.8);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.schedule-debug-btn:hover {
+  background: rgba(156, 39, 176, 0.8);
+  border-color: rgba(156, 39, 176, 1);
+}
+
+.schedule-debug-btn:active {
+  transform: translateY(1px);
+}
+
+.schedule-debug-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.schedule-debug-btn:disabled:hover {
+  background: rgba(156, 39, 176, 0.6);
+  border-color: rgba(156, 39, 176, 0.8);
+  transform: none;
+}
+
+.schedule-debug-output {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(156, 39, 176, 0.3);
+  border-radius: 4px;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  color: #f0f0f0;
+}
+
+.schedule-debug-output:empty::before {
+  content: '暂无输出...';
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.schedule-debug-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.schedule-debug-stat {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(156, 39, 176, 0.3);
+  text-align: center;
+}
+
+.schedule-debug-stat-label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2px;
+}
+
+.schedule-debug-stat-value {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #e1bee7;
+}
+
+.schedule-debug-test-area {
+  margin-top: 8px;
+}
+
+.schedule-debug-test-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(156, 39, 176, 0.3);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.schedule-debug-test-input:focus {
+  outline: none;
+  border-color: rgba(156, 39, 176, 0.8);
+  box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.2);
+}
+
+.schedule-debug-test-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .schedule-debug-panel {
+    width: calc(100vw - 20px);
+    left: 10px;
+    right: 10px;
+    max-height: 70vh;
+  }
+  
+  .schedule-debug-buttons {
+    flex-direction: column;
+  }
+  
+  .schedule-debug-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .schedule-debug-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 滚动条样式 */
+.schedule-debug-content::-webkit-scrollbar,
+.schedule-debug-output::-webkit-scrollbar {
+  width: 6px;
+}
+
+.schedule-debug-content::-webkit-scrollbar-track,
+.schedule-debug-output::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.schedule-debug-content::-webkit-scrollbar-thumb,
+.schedule-debug-output::-webkit-scrollbar-thumb {
+  background: rgba(156, 39, 176, 0.5);
+  border-radius: 3px;
+}
+
+.schedule-debug-content::-webkit-scrollbar-thumb:hover,
+.schedule-debug-output::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 39, 176, 0.7);
+}
+
+/* 加载状态 */
+.schedule-debug-loading {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(156, 39, 176, 0.3);
+  border-radius: 50%;
+  border-top-color: rgba(156, 39, 176, 0.8);
+  animation: schedule-debug-spin 1s ease-in-out infinite;
+  margin-left: 8px;
+}
+
+@keyframes schedule-debug-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 成功/错误状态指示 */
+.schedule-debug-success {
+  color: #4caf50;
+}
+
+.schedule-debug-error {
+  color: #f44336;
+}
+
+.schedule-debug-warning {
+  color: #ff9800;
+}
+
+/* 隐藏状态 */
+.schedule-debug-panel.hidden {
+  display: none;
+}

@@ -48,3 +48,15 @@
   border-color: rgba(26, 58, 109, 0.774);
   color: #000000;
 }
+
+.debug-toggle-btn.schedule-debug-btn {
+  background: rgba(33, 33, 33, 0.806);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgb(224, 224, 224);
+}
+
+.debug-toggle-btn.schedule-debug-btn:hover {
+  background: rgba(156, 39, 176, 0.3);
+  border-color: rgba(74, 20, 140, 0.774);
+  color: #000000;
+}
