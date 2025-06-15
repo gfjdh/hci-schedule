@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import EventTile from './EventTile';
 import { type Event, EventManager, initialEvents } from './EventManager';
 import { useVoiceRecognition } from './hooks/useVoiceRecognition';
@@ -6,6 +6,9 @@ import { VoiceDebugPanel } from './components/VoiceDebugPanel';
 import { ControlArea } from './components/ControlArea';
 import { ApiDebugPanel } from './components/ApiDebugPanel';
 import { ScheduleDebugPanel } from './components/ScheduleDebugPanel';
+import { MessageBuilder } from './LLMapi/msgBuilder';
+import { CommandExecutor } from './LLMapi/commandExecutor';
+import { useScheduleDescription } from './hooks/useScheduleDescription';
 import './ScheduleArea.css';
 
 const ScheduleArea: React.FC = () => {
@@ -18,12 +21,102 @@ const ScheduleArea: React.FC = () => {
   const [debugPanelVisible, setDebugPanelVisible] = useState(false);
   const [apiDebugPanelVisible, setApiDebugPanelVisible] = useState(false);
   const [scheduleDebugPanelVisible, setScheduleDebugPanelVisible] = useState(false);
+  const [commandStatus, setCommandStatus] = useState<{
+    status: 'idle' | 'processing' | 'success' | 'error' | 'need_more_info';
+    message: string;
+    data?: any;
+    missingInfo?: string;
+  }>({ status: 'idle', message: '' });
+
+  const [supplementInput, setSupplementInput] = useState('');
+  const [isWaitingForSupplement, setIsWaitingForSupplement] = useState(false);
+  const prevCommandRef = useRef('');
+  const { getScheduleDescription } = useScheduleDescription();
+
+  // 处理执行命令
+  const handleExecuteCommand = async () => {
+    if (commandInput.trim() === '') return;
+    setCommandStatus({ status: 'processing', message: '处理中...' });
+    prevCommandRef.current = commandInput;
+
+    try {
+      const msgBuilder = new MessageBuilder();
+      const scheduleDescription = getScheduleDescription(eventManager.getAllEvents());
+      const result = await msgBuilder.processCommand(commandInput, scheduleDescription);
+      if (result.status === 'need_more_info') {
+        setCommandStatus({
+          status: 'need_more_info',
+          message: result.message,
+          missingInfo: result.missingInfo
+        });
+        setIsWaitingForSupplement(true);
+        return;
+      }
+
+      if (result.status === 'success') {
+        // 如果是操作指令
+        if (result.data) {
+          const executor = new CommandExecutor(eventManager);
+          const execResult = executor.execute(result.data);
+
+          if (execResult.success) {
+            // 更新事件列表
+            setEvents(eventManager.getAllEvents());
+            setCommandStatus({
+              status: 'success',
+              message: '操作成功：' + execResult.message
+            });
+          } else {
+            setCommandStatus({
+              status: 'error',
+              message: execResult.message
+            });
+          }
+        } else {
+          // 如果是帮助信息或建议
+          setCommandStatus({
+            status: 'success',
+            message: result.message
+          });
+        }
+      } else {
+        setCommandStatus(result);
+      }
+    } catch (error: any) {
+      setCommandStatus({
+        status: 'error',
+        message: error.message
+      });
+    } finally {
+      if (!isWaitingForSupplement) {
+        setCommandInput('');
+      }
+    }
+  };
+
+  // 处理补充信息提交
+  const handleSupplementSubmit = () => {
+    if (supplementInput.trim() === '') return;
+
+    // 合并原始指令和补充信息
+    const combinedInput = `${prevCommandRef.current} ${supplementInput}`;
+    setCommandInput(combinedInput);
+    setIsWaitingForSupplement(false);
+    setSupplementInput('');
+
+    // 重新执行命令
+    setCommandStatus({ status: 'processing', message: '处理补充信息...' });
+    setTimeout(() => {
+      handleExecuteCommand();
+    }, 100);
+  };
 
   // 环境检测
   const isDevelopment = import.meta.env.VITE_APP_ENV === 'development' || import.meta.env.DEV;
 
   // 当事件管理器中的数据变化时更新状态
   useEffect(() => {
+    eventManager.loadFromStorage();
     setEvents(eventManager.getAllEvents());
   }, [eventManager]);
 
@@ -180,6 +273,7 @@ const ScheduleArea: React.FC = () => {
         onToggleDebugPanel={() => setDebugPanelVisible(!debugPanelVisible)}
         onToggleApiDebugPanel={() => setApiDebugPanelVisible(!apiDebugPanelVisible)}
         onToggleScheduleDebugPanel={() => setScheduleDebugPanelVisible(!scheduleDebugPanelVisible)}
+        onExecuteCommand={handleExecuteCommand}
       />
 
       {/* 语音调试面板 */}
@@ -205,6 +299,30 @@ const ScheduleArea: React.FC = () => {
         onClose={() => setScheduleDebugPanelVisible(false)}
         isDevelopment={isDevelopment}
       />
+
+      {/* 命令状态显示 */}
+      {commandStatus.status !== 'idle' && (
+        <div className={`command-status ${commandStatus.status}`}>
+          {commandStatus.message}
+        </div>
+      )}
+
+      {/* 补充信息输入区域 */}
+      {isWaitingForSupplement && (
+        <div className="supplement-area">
+          <div className="supplement-prompt">{commandStatus.missingInfo}</div>
+          <input
+            type="text"
+            value={supplementInput}
+            onChange={(e) => setSupplementInput(e.target.value)}
+            placeholder="请输入补充信息..."
+          />
+          <div className="supplement-buttons">
+            <button onClick={handleSupplementSubmit}>提交</button>
+            <button onClick={() => setIsWaitingForSupplement(false)}>取消</button>
+          </div>
+        </div>
+      )}
 
       <div className="content-area">
         <div className="quadrant-view">

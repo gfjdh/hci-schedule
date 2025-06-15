@@ -64,8 +64,9 @@ export class APIClient {
                 signal: AbortSignal.timeout(3600000)
             })
             const response = await responseData.json()
-            // const requestInfo = (`APIID: ${response.id}, 输入token: ${response.usage.prompt_tokens}, 输出token: ${response.usage.completion_tokens}, 总token: ${response.usage.total_tokens}`)
-            // const reasoning_content = response.choices[0].message.reasoning_content || '无'
+            const requestInfo = (`APIID: ${response.id}, 输入token: ${response.usage.prompt_tokens}, 输出token: ${response.usage.completion_tokens}, 总token: ${response.usage.total_tokens}`)
+            const reasoning_content = response.choices[0].message.reasoning_content || '无'
+            console.log(`API请求成功: ${requestInfo}, 推理内容: ${reasoning_content}, 返回内容: ${response.choices[0].message.content}`)
             const content = response.choices[0].message.content
             return { content: content, error: false }
         } catch (error) {

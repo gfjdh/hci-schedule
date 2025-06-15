@@ -211,6 +211,84 @@
   flex-grow: 1;
 }
 
+/* 命令状态显示 */
+.command-status {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.command-status.processing {
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  color: #1890ff;
+}
+
+.command-status.success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.command-status.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #f5222d;
+}
+
+.command-status.need_more_info {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #faad14;
+}
+
+/* 补充信息区域 */
+.supplement-area {
+  padding: 15px;
+  margin: 15px 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.supplement-prompt {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.supplement-area input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.supplement-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.supplement-buttons button {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.supplement-buttons button:first-child {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+}
+
+.supplement-buttons button:last-child {
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .sidebar {

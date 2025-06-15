@@ -1,6 +1,6 @@
 // msgBuilder.ts
 import { APIClient } from './api';
-import { useScheduleDescription } from '../hooks/useScheduleDescription';
+import type { Event } from '../EventManager';
 
 // 定义用户指令意图类型
 type IntentType = 
@@ -19,22 +19,10 @@ interface IntentResponse {
 // 第二步操作指令的结构
 interface OperationCommand {
   operation: 'add' | 'update' | 'delete';
-  event: {
-    id?: string;
-    name: string;
-    startTime?: string;
-    endTime?: string;
-    importance?: number;
-    size?: number;
-    details?: {
-      location?: string;
-      notes?: string;
-      estimatedHours?: number;
-    };
-  };
+  event: Partial<Event>;
 }
 
-class MessageBuilder {
+export class MessageBuilder {
   private apiClient: APIClient;
   constructor() {
     this.apiClient = new APIClient();
@@ -48,8 +36,8 @@ class MessageBuilder {
 - help: 用户需要帮助，例如询问如何使用、功能说明等
 - suggest_with_info: 用户要求生成今日安排建议，并且已经提供了今日的空闲时长（例如"我今天有4小时空闲"）
 - suggest_without_info: 用户要求生成今日安排建议，但没有提供今日的空闲时长
-- modify_with_info: 用户要求增删改日程，并且提供了足够的信息（例如事件名称、时间等）
-- modify_without_info: 用户要求增删改日程，但信息不足（例如缺少时间、事件名称等）
+- modify_with_info: 用户要求增删改日程，并且提供了足够的信息（例如事件名称、时间等，注意：删除只需要日程名）
+- modify_without_info: 用户要求增删改日程，但信息不足（例如缺少时间、事件名称等，注意：删除只需要日程名）
 
 注意：如果用户要求增删改日程，但缺少必要信息，请在missing_info中说明需要补充什么信息（例如"请提供事件的具体时间"）。
 
@@ -63,13 +51,10 @@ class MessageBuilder {
     ];
 
     const response = await this.apiClient.chat(messages);
-    
-    if (response.error) {
-      throw new Error(`API请求失败: ${response.content}`);
-    }
-
+    const filteredResponse = response.content.trim().match(/```json\s*({[\s\S]*})\s*```/);
+    const jsonMatch = filteredResponse ? filteredResponse[1] : response.content;
     try {
-      const result: IntentResponse = JSON.parse(response.content);
+      const result: IntentResponse = JSON.parse(jsonMatch);
       if (!result.intent) {
         throw new Error('返回的JSON格式不正确');
       }
@@ -107,9 +92,7 @@ class MessageBuilder {
   }
 
   // 第二步：处理日程建议请求
-  public async handleSuggestionRequest(userInput: string): Promise<string> {
-    const scheduleDescription = useScheduleDescription();
-    
+  public async handleSuggestionRequest(userInput: string, scheduleDescription: string): Promise<string> {
     const prompt = `你是一个日程管理助手，请根据用户提供的空闲时间和当前日程，为用户生成今日的安排建议。
 
 当前日程事件列表：
@@ -134,9 +117,7 @@ ${scheduleDescription}
   }
 
   // 第二步：解析操作指令
-  public async parseOperationCommands(userInput: string): Promise<OperationCommand[]> {
-    const scheduleDescription = useScheduleDescription();
-    
+  public async parseOperationCommands(userInput: string, scheduleDescription: string): Promise<OperationCommand[]> {
     const prompt = `你是一个日程管理助手，请将用户的自然语言指令转换成机器可读的JSON指令。
 
 当前日程事件列表：
@@ -174,6 +155,7 @@ ${scheduleDescription}
   {
     "operation": "delete",
     "event": {
+      "id": "evt_12345",
       "name": "旧会议"
     }
   }
@@ -187,13 +169,16 @@ ${scheduleDescription}
     ];
 
     const response = await this.apiClient.chat(messages);
+    const filteredResponse = response.content.trim().match(/```json\s*(\[[\s\S]*\]|\{[\s\S]*\})\s*```/);
+    const jsonMatch = filteredResponse ? filteredResponse[1] : response.content;
+
     
     if (response.error) {
       throw new Error(`解析操作指令失败: ${response.content}`);
     }
 
     try {
-      const commands: OperationCommand[] = JSON.parse(response.content);
+      const commands: OperationCommand[] = JSON.parse(jsonMatch);
       if (!Array.isArray(commands)) {
         throw new Error('返回的不是数组');
       }
@@ -204,7 +189,7 @@ ${scheduleDescription}
   }
 
   // 主处理函数
-  public async processCommand(userInput: string): Promise<{
+  public async processCommand(userInput: string, scheduleDescription: string): Promise<{
     status: 'success' | 'need_more_info' | 'error';
     message: string;
     data?: any;
@@ -231,7 +216,7 @@ ${scheduleDescription}
           };
           
         case 'suggest_with_info':
-          const suggestion = await this.handleSuggestionRequest(userInput);
+          const suggestion = await this.handleSuggestionRequest(userInput, scheduleDescription);
           return {
             status: 'success',
             message: suggestion
@@ -245,7 +230,7 @@ ${scheduleDescription}
           };
           
         case 'modify_with_info':
-          const commands = await this.parseOperationCommands(userInput);
+          const commands = await this.parseOperationCommands(userInput, scheduleDescription);
           return {
             status: 'success',
             message: `解析到${commands.length}个操作指令`,

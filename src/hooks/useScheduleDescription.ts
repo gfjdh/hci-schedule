@@ -63,7 +63,7 @@ export function useScheduleDescription() {
     const parts: string[] = [];
     
     // 基本信息
-    parts.push(`${index + 1}. 【${event.name}】`);
+    parts.push(`${index + 1}. 日程id:${event.id},日程名：${event.name}`);
     
     // 时间信息
     if (event.startTime && event.endTime) {
