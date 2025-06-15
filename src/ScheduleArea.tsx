@@ -44,28 +44,51 @@ const ScheduleArea: React.FC = () => {
     setIsEditing(false);
   };
 
-  function calcEventColor(importance: number, urgency: number) {
-    // importance, urgency ∈ [0,1]
-    // 计算权重，越大越红，越小越蓝
-    const weight = (importance + urgency) / 2;
-    // hue: 220(蓝) → 0(红)
-    const hue = 220 - 220 * weight;
-    // 饱和度和亮度可微调
+  function calcUrgency(
+    importance: number,   // 0~1
+    size: number,         // 实际工作量
+    remainHours: number,  // 剩余小时数
+    maxSize = 100,
+    maxRemain = 72
+  ) {
+    // 边界条件
+    if (size <= 0) return 0;
+    if (remainHours <= 0) return 1;
+  
+    // 归一化
+    const sizeNorm = Math.max(0, Math.min(size / maxSize, 1));
+    const remainNorm = 1 - Math.max(0, Math.min(remainHours / maxRemain, 1)); // 越少越大
+  
+    // 增强极端值影响（幂函数）
+    const impAdj = Math.pow(importance, 1.7);
+    const sizeAdj = Math.pow(sizeNorm, 1.7);
+    const remainAdj = Math.pow(remainNorm, 1.7);
+  
+    // 平滑加权平均
+    const urgency = 0.4 * impAdj + 0.3 * sizeAdj + 0.3 * remainAdj;
+  
+    // 保证在0~1之间
+    return Math.max(0, Math.min(urgency, 1));
+  }
+
+  function calcEventColor(urgency: number) {
+    // urgency ∈ [0,1]
+    // 越紧急越红，越不紧急越蓝
+    const hue = 220 - 220 * urgency; // 0=红，220=蓝
     const saturation = 80;
-    const lightness = 55 - 20 * weight; // 越重要越暗
+    const lightness = 55 - 20 * urgency; // 越紧急越暗
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   }
 
   const handleAddEvent = () => {
-    const importance = 0.5;
     const urgency = 0.5;
-    const color = calcEventColor(importance, urgency);
+    const color = calcEventColor(urgency);
     const newEvent: Event = {
       id: `evt_${Date.now()}`,
       name: '新事件',
       size: 50,
       color,
-      importance,
+      importance: 0.5,
       urgency,
       startTime: new Date().toISOString(),
       endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
@@ -113,12 +136,21 @@ const ScheduleArea: React.FC = () => {
   const handleFieldChange = (field: keyof Event, value: any) => {
     if (tempEvent) {
       const updated = { ...tempEvent, [field]: value };
-      // 如果改的是重要性或紧迫性，自动更新颜色
-      if (field === 'importance' || field === 'urgency') {
-        const importance = field === 'importance' ? value : updated.importance ?? 0.5;
-        const urgency = field === 'urgency' ? value : updated.urgency ?? 0.5;
-        updated.color = calcEventColor(importance, urgency);
-      }
+  
+      // 计算剩余小时数
+      const now = new Date();
+      const endTime = new Date(field === 'endTime' ? value : updated.endTime ?? now);
+      const remainMs = endTime.getTime() - now.getTime();
+      const remainHours = Math.max(0, remainMs / (1000 * 60 * 60));
+  
+      // 获取最新的 importance 和 size
+      const importance = field === 'importance' ? value : updated.importance ?? 0.5;
+      const size = field === 'size' ? value : updated.size ?? 50;
+  
+      // 自动计算紧迫性
+      updated.urgency = calcUrgency(importance, size, remainHours);
+      updated.color = calcEventColor(updated.urgency);
+  
       setTempEvent(updated);
     }
   };
@@ -252,7 +284,7 @@ const ScheduleArea: React.FC = () => {
                 )}
               </div>
 
-              {/* 紧迫性字段 */}
+              {/* 紧迫性字段, 不可修改 */}
               <div className="detail-item">
                 <span className="detail-label">紧迫性</span>
                 <div className="detail-value">
@@ -265,7 +297,8 @@ const ScheduleArea: React.FC = () => {
                           max="1"
                           step="0.01"
                           value={tempEvent?.urgency || 0}
-                          onChange={(e) => handleFieldChange('urgency', parseFloat(e.target.value))}
+                          readOnly
+                          disabled
                           className="edit-slider"
                         />
                         <span>{tempEvent?.urgency?.toFixed(2)}</span>
