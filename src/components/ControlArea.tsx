@@ -2,9 +2,9 @@ import React from 'react';
 import { CustomButton } from '../Buttons';
 import type { VoiceRecognitionState } from '../VoiceRecognition';
 import { DebugIndicator } from './DebugIndicator';
-import './VoiceControlArea.css';
+import './ControlArea.css';
 
-export interface VoiceControlAreaProps {
+export interface ControlAreaProps {
   voiceState: VoiceRecognitionState;
   commandInput: string;
   onCommandInputChange: (value: string) => void;
@@ -17,7 +17,7 @@ export interface VoiceControlAreaProps {
   onToggleScheduleDebugPanel?: () => void;
 }
 
-export const VoiceControlArea: React.FC<VoiceControlAreaProps> = ({
+export const ControlArea: React.FC<ControlAreaProps> = ({
   voiceState,
   commandInput,
   onCommandInputChange,

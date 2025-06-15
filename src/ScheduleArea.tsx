@@ -3,7 +3,7 @@ import EventTile from './EventTile';
 import { type Event, EventManager, initialEvents } from './EventManager';
 import { useVoiceRecognition } from './hooks/useVoiceRecognition';
 import { VoiceDebugPanel } from './components/VoiceDebugPanel';
-import { VoiceControlArea } from './components/VoiceControlArea';
+import { ControlArea } from './components/ControlArea';
 import { ApiDebugPanel } from './components/ApiDebugPanel';
 import { ScheduleDebugPanel } from './components/ScheduleDebugPanel';
 import './ScheduleArea.css';
@@ -170,7 +170,7 @@ const ScheduleArea: React.FC = () => {
   return (
     <div className="schedule-container">
       {/* 语音控制区域 */}
-      <VoiceControlArea
+      <ControlArea
         voiceState={voiceState}
         commandInput={commandInput}
         onCommandInputChange={setCommandInput}
