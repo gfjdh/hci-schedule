@@ -106,7 +106,8 @@
   overflow-y: auto;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
-  overflow-y: auto;
+  height: 100%;
+  flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -232,7 +233,7 @@
     width: 100%;
     max-width: none;
     min-width: auto;
-    height: 40vh;
+    flex: 1; /* 使用flex布局自适应剩余空间 */
     border-left: none;
     border-top: 1px solid #dee2e6;
     order: 2;
@@ -256,7 +257,7 @@
   }
   
   .sidebar {
-    height: 35vh;
+    flex: 1; /* 使用flex布局自适应剩余空间 */
     padding: 15px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
