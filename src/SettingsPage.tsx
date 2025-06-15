@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CustomButton } from './Buttons';
-import { LocalStorageService } from './LocalStorageService';
+import { LocalStorageService } from './hooks/useLocalStorageService';
 
 const SettingsPage: React.FC = () => {
   // 设置项类型

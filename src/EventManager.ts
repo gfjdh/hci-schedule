@@ -1,5 +1,5 @@
 // EventManager.ts
-import { LocalStorageService } from './LocalStorageService';
+import { LocalStorageService } from './hooks/useLocalStorageService';
 
 export interface Event {
     id: string;
