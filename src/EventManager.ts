@@ -62,6 +62,14 @@ export class EventManager implements IEventManager {
     return this.events.find(event => event.id === id);
   }
 
+  // 按日期范围获取事件的方法
+  getEventsByDateRange(startDate: Date, endDate: Date): Event[] {
+    return this.events.filter(event => {
+      const eventDate = new Date(event.startTime);
+      return eventDate >= startDate && eventDate <= endDate;
+    });
+  }
+
   getAllEvents(): Event[] {
     return [...this.events];
   }

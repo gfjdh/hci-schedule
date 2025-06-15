@@ -18,7 +18,7 @@ const ScheduleArea: React.FC = () => {
   const [debugPanelVisible, setDebugPanelVisible] = useState(false);
   const [apiDebugPanelVisible, setApiDebugPanelVisible] = useState(false);
   const [scheduleDebugPanelVisible, setScheduleDebugPanelVisible] = useState(false);
-  
+
   // 环境检测
   const isDevelopment = import.meta.env.VITE_APP_ENV === 'development' || import.meta.env.DEV;
 
@@ -54,19 +54,19 @@ const ScheduleArea: React.FC = () => {
     // 边界条件
     if (size <= 0) return 0;
     if (remainHours <= 0) return 1;
-  
+
     // 归一化
     const sizeNorm = Math.max(0, Math.min(size / maxSize, 1));
     const remainNorm = 1 - Math.max(0, Math.min(remainHours / maxRemain, 1)); // 越少越大
-  
+
     // 增强极端值影响（幂函数）
     const impAdj = Math.pow(importance, 1.7);
     const sizeAdj = Math.pow(sizeNorm, 1.7);
     const remainAdj = Math.pow(remainNorm, 1.7);
-  
+
     // 平滑加权平均
     const urgency = 0.4 * impAdj + 0.3 * sizeAdj + 0.3 * remainAdj;
-  
+
     // 保证在0~1之间
     return Math.max(0, Math.min(urgency, 1));
   }
@@ -114,7 +114,7 @@ const ScheduleArea: React.FC = () => {
       eventManager.updateEvent(selectedEvent.id, tempEvent);
       const updatedEvents = eventManager.getAllEvents();
       setEvents(updatedEvents);
-      
+
       const updatedEvent = eventManager.getEvent(selectedEvent.id);
       if (updatedEvent) {
         setSelectedEvent(updatedEvent);
@@ -136,21 +136,21 @@ const ScheduleArea: React.FC = () => {
   const handleFieldChange = (field: keyof Event, value: any) => {
     if (tempEvent) {
       const updated = { ...tempEvent, [field]: value };
-  
+
       // 计算剩余小时数
       const now = new Date();
       const endTime = new Date(field === 'endTime' ? value : updated.endTime ?? now);
       const remainMs = endTime.getTime() - now.getTime();
       const remainHours = Math.max(0, remainMs / (1000 * 60 * 60));
-  
+
       // 获取最新的 importance 和 size
       const importance = field === 'importance' ? value : updated.importance ?? 0.5;
       const size = field === 'size' ? value : updated.size ?? 50;
-  
+
       // 自动计算紧迫性
       updated.urgency = calcUrgency(importance, size, remainHours);
       updated.color = calcEventColor(updated.urgency);
-  
+
       setTempEvent(updated);
     }
   };
@@ -181,7 +181,7 @@ const ScheduleArea: React.FC = () => {
         onToggleApiDebugPanel={() => setApiDebugPanelVisible(!apiDebugPanelVisible)}
         onToggleScheduleDebugPanel={() => setScheduleDebugPanelVisible(!scheduleDebugPanelVisible)}
       />
-      
+
       {/* 语音调试面板 */}
       <VoiceDebugPanel
         voiceState={voiceState}
@@ -190,14 +190,14 @@ const ScheduleArea: React.FC = () => {
         onClose={() => setDebugPanelVisible(false)}
         isDevelopment={isDevelopment}
       />
-      
+
       {/* API调试面板 */}
       <ApiDebugPanel
         visible={apiDebugPanelVisible}
         onClose={() => setApiDebugPanelVisible(false)}
         isDevelopment={isDevelopment}
       />
-      
+
       {/* 日程调试面板 */}
       <ScheduleDebugPanel
         events={events}
@@ -289,48 +289,33 @@ const ScheduleArea: React.FC = () => {
                 <span className="detail-label">紧迫性</span>
                 <div className="detail-value">
                   {
-                    isEditing ? (
-                      <div className="edit-fields">
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.01"
-                          value={tempEvent?.urgency || 0}
-                          readOnly
-                          disabled
-                          className="edit-slider"
-                        />
-                        <span>{tempEvent?.urgency?.toFixed(2)}</span>
-                      </div>
-                    ) : (
-                      selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'
-                    )}
-                  </div>
+                    selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'
+                  }
+                </div>
               </div>
 
               {/* 重要性字段 */}
               <div className="detail-item">
                 <span className="detail-label">重要性</span>
                 <div className="detail-value">
-                {isEditing ? (
-                  <div className="edit-fields">
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      value={tempEvent?.importance || 0}
-                      onChange={(e) => handleFieldChange('importance', parseFloat(e.target.value))}
-                      className="edit-slider"
-                    />
-                    <span>{tempEvent?.importance?.toFixed(2)}</span>
-                  </div>
-                ) : (
-                  <div className="detail-value">
-                    {selectedEvent.importance > 0.7 ? '高' : selectedEvent.importance > 0.4 ? '中' : '低'}
-                  </div>
-                )}
+                  {isEditing ? (
+                    <div className="edit-fields">
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={tempEvent?.importance || 0}
+                        onChange={(e) => handleFieldChange('importance', parseFloat(e.target.value))}
+                        className="edit-slider"
+                      />
+                      <span>{tempEvent?.importance?.toFixed(2)}</span>
+                    </div>
+                  ) : (
+                    <div className="detail-value">
+                      {selectedEvent.importance > 0.7 ? '高' : selectedEvent.importance > 0.4 ? '中' : '低'}
+                    </div>
+                  )}
                 </div>
               </div>
 
