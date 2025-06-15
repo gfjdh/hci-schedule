@@ -1,7 +1,7 @@
 // 当前仅用于调试deepseek的API调用
 
 import React, { useState, useEffect } from 'react';
-import { DeepSeekClient } from '../LLMapi/deepseek';
+import { APIClient } from '../LLMapi/api';
 import './ApiDebugPanel.css';
 
 export interface ApiDebugPanelProps {
@@ -29,15 +29,15 @@ export const ApiDebugPanel: React.FC<ApiDebugPanelProps> = ({
   const [testInput, setTestInput] = useState('你好，请介绍一下你自己');
   const [isLoading, setIsLoading] = useState(false);
   const [testResults, setTestResults] = useState<ApiTestResult[]>([]);
-  const [deepseekClient] = useState(() => new DeepSeekClient());
+  const ApiClient = new APIClient()
   const [apiKeyStatus, setApiKeyStatus] = useState<'unknown' | 'valid' | 'invalid'>('unknown');
 
   // 检查API密钥状态
   useEffect(() => {
     if (visible) {
-      setApiKeyStatus(deepseekClient.hasApiKey() ? 'valid' : 'invalid');
+      setApiKeyStatus(ApiClient.hasApiKey() ? 'valid' : 'invalid');
     }
-  }, [visible, deepseekClient]);
+  }, [visible, ApiClient]);
 
   // 拖动相关函数
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -81,7 +81,7 @@ export const ApiDebugPanel: React.FC<ApiDebugPanelProps> = ({
     const startTime = Date.now();
     
     try {
-      const result = await deepseekClient.chat([
+      const result = await ApiClient.chat([
         { role: 'user', content: testInput }
       ]);
       
@@ -89,7 +89,7 @@ export const ApiDebugPanel: React.FC<ApiDebugPanelProps> = ({
       const newResult: ApiTestResult = {
         timestamp: new Date().toLocaleTimeString(),
         request: testInput,
-        response: result.error ? (result.errorMessage || '请求失败') : result.content,
+        response: result.content,
         error: result.error,
         duration
       };
@@ -156,7 +156,7 @@ export const ApiDebugPanel: React.FC<ApiDebugPanelProps> = ({
           <div className="status-item">
             <span className="status-label">配置提示:</span>
             <span className="status-value warning">
-              请在.env.local中设置DEEPSEEK_API_KEY
+              请在设置页中设置API_KEY
             </span>
           </div>
         )}

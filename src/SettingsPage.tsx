@@ -5,18 +5,18 @@ import { LocalStorageService } from './hooks/useLocalStorageService';
 const SettingsPage: React.FC = () => {
   // 设置项类型
   type Setting = {
-    username: string;
-    notifications: boolean;
-    language: 'zh' | 'en';
-    timeFormat: '12h' | '24h';
+    baseURL: string
+    key: string
+    appointModel: string
+    temperature: number
   };
 
   // 默认设置
   const defaultSettings: Setting = {
-    username: '用户',
-    notifications: true,
-    language: 'zh',
-    timeFormat: '24h'
+    baseURL: 'https://api.deepseek.com/v1/chat/completions',
+    key: '',
+    appointModel: 'deepseek-R1',
+    temperature: 0.7,
   };
 
   const [settings, setSettings] = useState<Setting>(defaultSettings);
@@ -24,7 +24,7 @@ const SettingsPage: React.FC = () => {
 
   // 从本地存储加载设置
   useEffect(() => {
-    const savedSettings = LocalStorageService.loadData<Setting>('app_settings', defaultSettings);
+    const savedSettings = getSettings();
     setSettings(savedSettings);
   }, []);
 
@@ -45,27 +45,51 @@ const SettingsPage: React.FC = () => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
+  // 获取设置
+  const getSettings = () => {
+    return LocalStorageService.loadData<Setting>('app_settings', defaultSettings);
+  };
+
   return (
     <div className="settings-container">
       <h2>应用设置</h2>
       
       <div className="setting-item">
-        <label>用户名：</label>
+        <label>模型请求地址：</label>
         <input 
           type="text" 
-          value={settings.username} 
-          onChange={(e) => handleChange('username', e.target.value)} 
+          value={settings.baseURL || ''} 
+          onChange={(e) => handleChange('baseURL', e.target.value)} 
         />
       </div>
       
       <div className="setting-item">
-        <label>通知：</label>
+        <label>API 密钥：</label>
         <input 
-          type="checkbox" 
-          checked={settings.notifications} 
-          onChange={(e) => handleChange('notifications', e.target.checked)} 
+          type="text" 
+          value={settings.key || ''} 
+          onChange={(e) => handleChange('key', e.target.value)} 
         />
-        <span>启用通知</span>
+      </div>
+
+      <div className="setting-item">
+        <label>模型名称：</label>
+        <input 
+          type="text" 
+          value={settings.appointModel || ''} 
+          onChange={(e) => handleChange('appointModel', e.target.value)} 
+        />
+      </div>
+
+      <div className="setting-item">
+        <label>温度：</label>
+        <input 
+          type="number" 
+          step="0.1" 
+          value={settings.temperature} 
+          onChange={(e) => handleChange('temperature', parseFloat(e.target.value))} 
+        />
+        <span>（0.0 - 1.0）</span>
       </div>
       
       <div className="setting-actions">

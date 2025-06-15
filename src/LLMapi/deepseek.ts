@@ -1,4 +1,4 @@
-// 暂未投入使用
+// 这个，不需要了（大概）
 
 interface DeepSeekConfig {
     baseURL: string

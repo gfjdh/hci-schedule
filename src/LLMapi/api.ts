@@ -1,3 +1,5 @@
+import { LocalStorageService } from '../hooks/useLocalStorageService';
+
 interface APIConfig {
     baseURL: string
     key: string
@@ -21,17 +23,23 @@ export class APIClient {
     private config: APIConfig
     constructor() {
         this.config = {
-            baseURL: 'https://api.example.com',
-            key: 'your-api-key',
-            appointModel: 'gpt-3.5-turbo',
+            baseURL: 'https://api.deepseek.com/v1/chat/completions',
+            key: '', 
+            appointModel: 'deepseek-R1',
             temperature: 0.7
         }
+        this.updateAPIConfig()
     }
 
     // 发送聊天请求
     public async chat(messages: Msg[]): Promise<{ content: string, error: boolean }> {
         const payload = this.createPayload(messages, this.config.appointModel)
         return await this.tryRequest(this.config.baseURL, payload, this.config.key)
+    }
+
+    // 检查API密钥是否存在
+    public hasApiKey(): boolean {
+        return !!this.config.key;
     }
 
     // 生成请求体
@@ -96,5 +104,16 @@ export class APIClient {
             default:
                 return { content: message, error: true };
         }
+    }
+
+    // 更新配置
+    public updateAPIConfig(): void {
+        const setting = LocalStorageService.loadData<APIConfig>('app_settings', this.config);
+        this.config = { ...this.config, ...setting };
+    }
+
+    // 获取当前配置
+    public getAPIConfig(): APIConfig {
+        return { ...this.config };
     }
 }
