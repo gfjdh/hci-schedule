@@ -14,6 +14,7 @@
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  height: calc(100% - 50px); /* 减去VoiceControlArea的实际高度 */
 }
 
 .quadrant-view {
@@ -106,7 +107,7 @@
   overflow-y: auto;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
-  height: 100%;
+  height: calc(100% - 50px); /* 减去VoiceControlArea的实际高度 */
   flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
 }
