@@ -106,6 +106,8 @@
   overflow-y: auto;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .event-details h3 {
@@ -212,6 +214,8 @@
   .sidebar {
     width: 300px;
     min-width: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .quadrant-view {
@@ -232,14 +236,14 @@
     border-left: none;
     border-top: 1px solid #dee2e6;
     order: 2;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .quadrant-view {
     order: 1;
     padding: 20px;
   }
-  
-
   
   .axis-label {
     font-size: 0.9rem;
@@ -254,6 +258,8 @@
   .sidebar {
     height: 35vh;
     padding: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .axis-label {
@@ -269,5 +275,3 @@
     padding: 6px;
   }
 }
-
-

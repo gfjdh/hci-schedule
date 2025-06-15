@@ -93,6 +93,9 @@
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .help-section {
