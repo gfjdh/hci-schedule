@@ -1,4 +1,5 @@
 import React from 'react';
+import './HelpPage.css';
 
 const HelpPage: React.FC = () => {
   return (
@@ -50,7 +51,7 @@ const HelpPage: React.FC = () => {
       </div>
       
       <div className="help-footer">
-        <p>需要更多帮助？请</p>
+        <p>需要更多帮助？请前往仓库 <a href="https://github.com/gfjdh/hci-schedule" target="_blank" rel="noopener noreferrer">https://github.com/gfjdh/hci-schedule</a></p>
       </div>
     </div>
   );

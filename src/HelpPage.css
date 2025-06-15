@@ -1,0 +1,71 @@
+/* HelpPage.css */
+
+.help-container {
+  max-width: 700px;
+  margin: 40px auto 0 auto;
+  height: 80vh;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(25, 118, 210, 0.08);
+  padding: 32px 28px;
+  font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+}
+
+.help-title {
+  font-size: 2rem;
+  color: #1976d2;
+  font-weight: bold;
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.help-section {
+  margin-bottom: 28px;
+}
+
+.help-section-title {
+  font-size: 1.2rem;
+  color: #1565c0;
+  font-weight: 600;
+  margin-bottom: 10px;
+  border-left: 4px solid #90caf9;
+  padding-left: 10px;
+}
+
+.help-text,
+.help-list {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+.help-list {
+  padding-left: 24px;
+  margin-bottom: 0;
+}
+
+.help-link {
+  color: #1976d2;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.help-link:hover {
+  color: #0d47a1;
+}
+
+@media (max-width: 600px) {
+  .help-container {
+    padding: 16px 6px;
+  }
+
+  .help-title {
+    font-size: 1.3rem;
+  }
+
+  .help-section-title {
+    font-size: 1rem;
+  }
+}
