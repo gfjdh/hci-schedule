@@ -22,7 +22,7 @@ interface EventTileProps {
 
 const EventTile: React.FC<EventTileProps> = ({ event, onClick }) => {
   // 计算磁贴大小 (基于剩余工作量)
-  const tileSize = Math.max(50, Math.min(200, event.size * 2));
+  const tileSize = Math.max(50, Math.min(100, event.size));
   
   return (
     <div 

@@ -440,7 +440,10 @@ const ScheduleArea: React.FC = () => {
                 {isEditing ? (
                   <div className="edit-fields">
                     <input
-                      type="number"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
                       value={tempEvent?.size || 0}
                       onChange={(e) => handleFieldChange('size', parseInt(e.target.value))}
                       className="edit-input"
