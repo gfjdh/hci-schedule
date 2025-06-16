@@ -125,10 +125,11 @@ ${scheduleDescription}
 
 用户输入：${userInput}
 如果用户输入的信息不完整，你可以估计一个合理的值。
+除非用户明确要求，否则对日程的操作都只针对同一个事件。
 请返回一个JSON数组，数组中的每个元素是一个操作指令。每个操作指令包含以下字段：
 - operation: 字符串，只能是"add", "delete", "update"
 - event: 事件对象，包含以下字段：
-    * id: 事件的唯一标识（更新和删除时必须提供）
+    * id: 事件的唯一标识（必须提供，值可以和今天的日期相关）
     * name: 事件名称（新增时必须）
     * startTime: 开始时间（ISO8601格式）
     * endTime: 结束时间（ISO8601格式）
@@ -141,6 +142,7 @@ ${scheduleDescription}
   {
     "operation": "add",
     "event": {
+      "id": "evt_12345",
       "name": "团队会议",
       "startTime": "2023-12-15T10:00:00",
       "endTime": "2023-12-15T11:30:00",

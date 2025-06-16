@@ -52,7 +52,6 @@ const ScheduleArea: React.FC = () => {
         setIsWaitingForSupplement(true);
         return;
       }
-      setCommandStatus({ status: 'processing', message: '已识别意图：' + result.status + ', 正在执行...' });
       if (result.status === 'success') {
         // 如果是操作指令
         if (result.data) {
@@ -195,7 +194,14 @@ const ScheduleArea: React.FC = () => {
   const handleEditToggle = () => {
     if (selectedEvent) {
       setIsEditing(!isEditing);
-      setTempEvent({ ...selectedEvent });
+      setTempEvent({
+        ...selectedEvent,
+        details: {
+          location: selectedEvent.details?.location ?? '',
+          notes: selectedEvent.details?.notes ?? '',
+          estimatedHours: selectedEvent.details?.estimatedHours ?? 0
+        }
+      });
     }
   };
 
@@ -440,10 +446,10 @@ const ScheduleArea: React.FC = () => {
                 {isEditing ? (
                   <div className="edit-fields">
                     <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        step="1"
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
                       value={tempEvent?.size || 0}
                       onChange={(e) => handleFieldChange('size', parseInt(e.target.value))}
                       className="edit-input"
@@ -458,59 +464,68 @@ const ScheduleArea: React.FC = () => {
               </div>
 
               {/* 地点字段 */}
-              {selectedEvent.details?.location && (
+              {isEditing ? (
                 <div className="detail-item">
                   <span className="detail-label">地点</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={tempEvent?.details?.location || ''}
-                      onChange={(e) => handleDetailChange('location', e.target.value)}
-                      className="edit-input"
-                    />
-                  ) : (
+                  <input
+                    type="text"
+                    value={tempEvent?.details?.location || ''}
+                    onChange={(e) => handleDetailChange('location', e.target.value)}
+                    className="edit-input"
+                  />
+                </div>
+              ) : (
+                selectedEvent.details?.location && (
+                  <div className="detail-item">
+                    <span className="detail-label">地点</span>
                     <div className="detail-value">
                       {selectedEvent.details.location}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )
               )}
 
               {/* 预计耗时字段 */}
-              {selectedEvent.details?.estimatedHours && (
+              {isEditing ? (
                 <div className="detail-item">
                   <span className="detail-label">预计耗时</span>
-                  {isEditing ? (
-                    <input
-                      type="number"
-                      value={tempEvent?.details?.estimatedHours || ''}
-                      onChange={(e) => handleDetailChange('estimatedHours', parseInt(e.target.value))}
-                      className="edit-input"
-                    />
-                  ) : (
+                  <input
+                    type="number"
+                    value={tempEvent?.details?.estimatedHours || ''}
+                    onChange={(e) => handleDetailChange('estimatedHours', parseInt(e.target.value))}
+                    className="edit-input"
+                  />
+                </div>
+              ) : (
+                selectedEvent.details?.estimatedHours !== undefined && (
+                  <div className="detail-item">
+                    <span className="detail-label">预计耗时</span>
                     <div className="detail-value">
                       {selectedEvent.details.estimatedHours} 小时
                     </div>
-                  )}
-                </div>
+                  </div>
+                )
               )}
 
               {/* 备注字段 */}
-              {selectedEvent.details?.notes && (
+              {isEditing ? (
                 <div className="detail-item">
                   <span className="detail-label">备注</span>
-                  {isEditing ? (
-                    <textarea
-                      value={tempEvent?.details?.notes || ''}
-                      onChange={(e) => handleDetailChange('notes', e.target.value)}
-                      className="edit-textarea"
-                    />
-                  ) : (
+                  <textarea
+                    value={tempEvent?.details?.notes || ''}
+                    onChange={(e) => handleDetailChange('notes', e.target.value)}
+                    className="edit-textarea"
+                  />
+                </div>
+              ) : (
+                selectedEvent.details?.notes && (
+                  <div className="detail-item">
+                    <span className="detail-label">备注</span>
                     <div className="detail-value">
                       {selectedEvent.details.notes}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )
               )}
             </div>
           ) : (

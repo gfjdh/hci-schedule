@@ -31,7 +31,7 @@ export class CommandExecutor {
             console.warn(`Unknown operation: ${(command as any).operation}`);
         }
       });
-      return { success: true, message: `操作执行成功: ${commands[0].operation} ${commands[0].event.id}` };
+      return { success: true, message: `操作执行成功: ${commands[0].operation} ${commands[0].event.id}-${commands[0].event.name}` };
     } catch (error: any) {
       return { success: false, message: `操作执行失败: ${error.message}` };
     }
