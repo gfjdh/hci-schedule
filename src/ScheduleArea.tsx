@@ -454,7 +454,7 @@ const ScheduleArea: React.FC = () => {
                       <span>{tempEvent?.importance?.toFixed(2)}</span>
                     </div>
                   ) : (
-                    <div className="detail-value">
+                    <div>
                       {selectedEvent.importance > 0.7 ? '高' : selectedEvent.importance > 0.4 ? '中' : '低'}
                     </div>
                   )}
@@ -464,24 +464,26 @@ const ScheduleArea: React.FC = () => {
               {/* 剩余工作量字段 */}
               <div className="detail-item">
                 <span className="detail-label">剩余工作量</span>
-                {isEditing ? (
-                  <div className="edit-fields">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value={tempEvent?.size || 0}
-                      onChange={(e) => handleFieldChange('size', parseInt(e.target.value))}
-                      className="edit-input"
-                    />
-                    <span>%</span>
-                  </div>
-                ) : (
-                  <div className="detail-value">
-                    {selectedEvent.size}%
-                  </div>
-                )}
+                <div className="detail-value">
+                  {isEditing ? (
+                    <div className="edit-fields">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={tempEvent?.size || 0}
+                        onChange={(e) => handleFieldChange('size', parseInt(e.target.value))}
+                        className="edit-input"
+                      />
+                      <span>{selectedEvent.size}%</span>
+                    </div>
+                  ) : (
+                    <div>
+                      {selectedEvent.size}%
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 地点字段 */}
