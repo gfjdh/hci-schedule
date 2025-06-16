@@ -257,12 +257,10 @@ const ScheduleArea: React.FC = () => {
         estimatedHours = (endTime.getTime() - beginTime.getTime()) / (1000 * 60 * 60);
         estimatedHours = Math.max(0, estimatedHours);
       }
-      console.log('estimatedHours:', estimatedHours);
 
       // 自动计算紧迫性
       updated.urgency = calcUrgency(importance, remainWork, remainHours, estimatedHours);
       updated.color = calcEventColor(updated.urgency);
-      console.log('updated.urgency:', updated.urgency);
 
       setTempEvent(updated);
     }
@@ -522,7 +520,10 @@ const ScheduleArea: React.FC = () => {
                   <input
                     type="number"
                     value={tempEvent?.details?.estimatedHours || ''}
-                    onChange={(e) => handleDetailChange('estimatedHours', parseInt(e.target.value))}
+                    onChange={(e) => {
+                      handleDetailChange('estimatedHours', parseInt(e.target.value))
+                      handleFieldChange('details', { ...tempEvent?.details, estimatedHours: parseInt(e.target.value) })
+                    }}
                     className="edit-input"
                   />
                 </div>
