@@ -94,7 +94,7 @@ export class MessageBuilder {
   // 第二步：处理日程建议请求
   public async handleSuggestionRequest(userInput: string, scheduleDescription: string): Promise<string> {
     const prompt = `你是一个日程管理助手，请根据用户提供的空闲时间和当前日程，为用户生成今日的安排建议。
-
+今天的日期是：${new Date().toISOString().split('T')[0]}。
 当前日程事件列表：
 ${scheduleDescription}
 
@@ -119,12 +119,12 @@ ${scheduleDescription}
   // 第二步：解析操作指令
   public async parseOperationCommands(userInput: string, scheduleDescription: string): Promise<OperationCommand[]> {
     const prompt = `你是一个日程管理助手，请将用户的自然语言指令转换成机器可读的JSON指令。
-
+今天的日期是：${new Date().toISOString().split('T')[0]}。
 当前日程事件列表：
 ${scheduleDescription}
 
 用户输入：${userInput}
-
+如果用户输入的信息不完整，你可以估计一个合理的值。
 请返回一个JSON数组，数组中的每个元素是一个操作指令。每个操作指令包含以下字段：
 - operation: 字符串，只能是"add", "delete", "update"
 - event: 事件对象，包含以下字段：
@@ -142,10 +142,10 @@ ${scheduleDescription}
     "operation": "add",
     "event": {
       "name": "团队会议",
-      "startTime": "2023-12-15T10:00:00Z",
-      "endTime": "2023-12-15T11:30:00Z",
+      "startTime": "2023-12-15T10:00:00",
+      "endTime": "2023-12-15T11:30:00",
       "importance": 0.8,
-      "size": 30,
+      "size": 100,
       "details": {
         "location": "会议室A",
         "estimatedHours": 1.5

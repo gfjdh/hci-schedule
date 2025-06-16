@@ -52,7 +52,7 @@ const ScheduleArea: React.FC = () => {
         setIsWaitingForSupplement(true);
         return;
       }
-
+      setCommandStatus({ status: 'processing', message: '已识别意图：' + result.status + ', 正在执行...' });
       if (result.status === 'success') {
         // 如果是操作指令
         if (result.data) {
@@ -99,16 +99,13 @@ const ScheduleArea: React.FC = () => {
     if (supplementInput.trim() === '') return;
 
     // 合并原始指令和补充信息
-    const combinedInput = `${prevCommandRef.current} ${supplementInput}`;
+    const combinedInput = `${prevCommandRef.current}，${supplementInput}`;
     setCommandInput(combinedInput);
     setIsWaitingForSupplement(false);
     setSupplementInput('');
 
     // 重新执行命令
-    setCommandStatus({ status: 'processing', message: '处理补充信息...' });
-    setTimeout(() => {
-      handleExecuteCommand();
-    }, 100);
+    setCommandStatus({ status: 'processing', message: '已添加补充信息，请点击执行' });
   };
 
   // 环境检测
