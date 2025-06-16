@@ -66,7 +66,7 @@ const SettingsPage: React.FC = () => {
       <div className="setting-item">
         <label>API 密钥：</label>
         <input 
-          type="text" 
+          type="password" 
           value={settings.key || ''} 
           onChange={(e) => handleChange('key', e.target.value)} 
         />
