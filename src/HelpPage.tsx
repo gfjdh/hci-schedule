@@ -20,7 +20,7 @@ const HelpPage: React.FC = () => {
           <div className="feature-card">
             <div className="feature-icon">🤖</div>
             <h3>AI智能指令</h3>
-            <p>使用自然语言指令管理日程，AI自动解析并执行</p>
+            <p>使用自然语言指令管理日程，AI自动解析并执行。还可以询问ai日程表的使用方法或者智能安排今日日程</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">⚙️</div>
@@ -92,10 +92,10 @@ const HelpPage: React.FC = () => {
               <li><strong>支持操作</strong>：
                 <ul>
                   <li>"如何使用本日程表？" - 询问使用方法</li>
+                  <li>"我今天有4小时空闲，有什么建议？" - 获取日程建议</li>
                   <li>"今天下午3点团队会议" - 添加新事件</li>
                   <li>"把设计评审改为明天上午" - 修改现有事件</li>
                   <li>"删除周报会议" - 删除事件</li>
-                  <li>"我今天有4小时空闲，有什么建议？" - 获取日程建议</li>
                 </ul>
               </li>
               <li><strong>指令状态反馈</strong>：系统会显示指令处理状态和结果</li>

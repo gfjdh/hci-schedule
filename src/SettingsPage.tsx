@@ -15,8 +15,8 @@ const SettingsPage: React.FC = () => {
   const defaultSettings: Setting = {
     baseURL: 'https://api.deepseek.com/v1/chat/completions',
     key: '',
-    appointModel: 'deepseek-R1',
-    temperature: 0.7,
+    appointModel: 'deepseek-chat',
+    temperature: 0.3,
   };
 
   const [settings, setSettings] = useState<Setting>(defaultSettings);
