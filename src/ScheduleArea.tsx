@@ -133,31 +133,24 @@ const ScheduleArea: React.FC = () => {
     setIsEditing(false);
   };
 
+  function urgencyLevelText(urgency: number) {
+    if (urgency >= 0.7) return '高';
+    if (urgency >= 0.4) return '中';
+    return '低';
+  }
+
   function calcUrgency(
     importance: number,   // 0~1
-    size: number,         // 实际工作量
+    remainWork: number,   // 剩余工作量
     remainHours: number,  // 剩余小时数
-    maxSize = 100,
-    maxRemain = 72
+    estimatedHours: number // 预计耗时
   ) {
-    // 边界条件
-    if (size <= 0) return 0;
-    if (remainHours <= 0) return 1;
-
-    // 归一化
-    const sizeNorm = Math.max(0, Math.min(size / maxSize, 1));
-    const remainNorm = 1 - Math.max(0, Math.min(remainHours / maxRemain, 1)); // 越少越大
-
-    // 增强极端值影响（幂函数）
-    const impAdj = Math.pow(importance, 1.7);
-    const sizeAdj = Math.pow(sizeNorm, 1.7);
-    const remainAdj = Math.pow(remainNorm, 1.7);
-
-    // 平滑加权平均
-    const urgency = 0.4 * impAdj + 0.3 * sizeAdj + 0.3 * remainAdj;
-
-    // 保证在0~1之间
-    return Math.max(0, Math.min(urgency, 1));
+    // 计算紧迫性
+    // 紧迫性 = 重要性 * (剩余工作量 / 100) * (预计耗时/剩余小时数)
+    // 保证紧迫性在 [0, 1] 范围内
+    if (remainHours <= 0 || estimatedHours <= 0) return 1; // 紧急
+    const urgency = importance * (remainWork / 100) * (estimatedHours / remainHours);
+    return Math.min(Math.max(urgency, 0), 1);
   }
 
   function calcEventColor(urgency: number) {
@@ -181,7 +174,11 @@ const ScheduleArea: React.FC = () => {
       urgency,
       startTime: new Date().toISOString(),
       endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-      details: {}
+      details: {
+        location: '暂无',
+        notes: '暂无',
+        estimatedHours: 24 // 默认预计耗时24小时
+      }
     };
 
     eventManager.addEvent(newEvent);
@@ -238,13 +235,15 @@ const ScheduleArea: React.FC = () => {
       const endTime = new Date(field === 'endTime' ? value : updated.endTime ?? now);
       const remainMs = endTime.getTime() - now.getTime();
       const remainHours = Math.max(0, remainMs / (1000 * 60 * 60));
-
-      // 获取最新的 importance 和 size
+      
+      // 获取最新的 importance , remainWork 和 details.estimatedHours
       const importance = field === 'importance' ? value : updated.importance ?? 0.5;
-      const size = field === 'size' ? value : updated.size ?? 50;
+      const remainWork = field === 'size' ? value : updated.size ?? 50;
+      const estimatedHours = updated.details?.estimatedHours ?? 24;
 
       // 自动计算紧迫性
-      updated.urgency = calcUrgency(importance, size, remainHours);
+      updated.urgency = calcUrgency(importance, remainWork, remainHours, estimatedHours);
+      console.log('importance:', importance, 'remainWork:', remainWork, 'remainHours:', remainHours, 'estimatedHours:', estimatedHours, 'urgency:', updated.urgency);
       updated.color = calcEventColor(updated.urgency);
 
       setTempEvent(updated);
@@ -410,7 +409,7 @@ const ScheduleArea: React.FC = () => {
                 <span className="detail-label">紧迫性</span>
                 <div className="detail-value">
                   {
-                    selectedEvent.urgency > 0.7 ? '高' : selectedEvent.urgency > 0.4 ? '中' : '低'
+                    urgencyLevelText(tempEvent?.urgency ?? 0)
                   }
                 </div>
               </div>
