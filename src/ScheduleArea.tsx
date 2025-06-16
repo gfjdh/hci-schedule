@@ -244,6 +244,7 @@ const ScheduleArea: React.FC = () => {
 
       // 计算剩余小时数
       const now = new Date();
+      const beginTime = new Date(field === 'startTime' ? value : updated.startTime ?? now);
       const endTime = new Date(field === 'endTime' ? value : updated.endTime ?? now);
       const remainMs = endTime.getTime() - now.getTime();
       const remainHours = Math.max(0, remainMs / (1000 * 60 * 60));
@@ -251,11 +252,17 @@ const ScheduleArea: React.FC = () => {
       // 获取最新的 importance , remainWork 和 details.estimatedHours
       const importance = field === 'importance' ? value : updated.importance ?? 0.5;
       const remainWork = field === 'size' ? value : updated.size ?? 50;
-      const estimatedHours = updated.details?.estimatedHours ?? 24;
+      let estimatedHours = updated.details?.estimatedHours ?? NaN;
+      if (isNaN(estimatedHours) || estimatedHours <= 0) {
+        estimatedHours = (endTime.getTime() - beginTime.getTime()) / (1000 * 60 * 60);
+        estimatedHours = Math.max(0, estimatedHours);
+      }
+      console.log('estimatedHours:', estimatedHours);
 
       // 自动计算紧迫性
       updated.urgency = calcUrgency(importance, remainWork, remainHours, estimatedHours);
       updated.color = calcEventColor(updated.urgency);
+      console.log('updated.urgency:', updated.urgency);
 
       setTempEvent(updated);
     }
