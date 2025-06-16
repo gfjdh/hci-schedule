@@ -10,10 +10,17 @@ import { MessageBuilder } from './LLMapi/msgBuilder';
 import { CommandExecutor } from './LLMapi/commandExecutor';
 import { useScheduleDescription } from './hooks/useScheduleDescription';
 import './ScheduleArea.css';
+import Modal from "./Modal";
+// 在文件顶部添加导入
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 
 const ScheduleArea: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  const [helpContent, setHelpContent] = useState("");
   const [tempEvent, setTempEvent] = useState<Partial<Event> | null>(null);
   const [eventManager] = useState<EventManager>(() => new EventManager(initialEvents));
   const [events, setEvents] = useState<Event[]>([]);
@@ -72,11 +79,11 @@ const ScheduleArea: React.FC = () => {
             });
           }
         } else {
-          // 如果是帮助信息或建议
-          setCommandStatus({
-            status: 'success',
-            message: result.message
-          });
+          // 帮助信息或建议 - 只显示在Modal中
+          setHelpContent(result.message);
+          setHelpModalVisible(true);
+          // 清空命令状态，确保不显示在ScheduleArea
+          setCommandStatus({ status: 'idle', message: '' });
         }
       } else {
         setCommandStatus(result);
@@ -92,7 +99,7 @@ const ScheduleArea: React.FC = () => {
       }
     }
   };
-
+ 
   // 处理补充信息提交
   const handleSupplementSubmit = () => {
     if (supplementInput.trim() === '') return;
@@ -149,6 +156,7 @@ const ScheduleArea: React.FC = () => {
     // 紧迫性 = 重要性 * (剩余工作量 / 100) * (预计耗时/剩余小时数)
     // 保证紧迫性在 [0, 1] 范围内
     if (remainHours <= 0 || estimatedHours <= 0) return 1; // 紧急
+    if (remainWork <= 0) return 0;
     const urgency = importance * (remainWork / 100) * (estimatedHours / remainHours);
     return Math.min(Math.max(urgency, 0), 1);
   }
@@ -163,21 +171,25 @@ const ScheduleArea: React.FC = () => {
   }
 
   const handleAddEvent = () => {
-    const urgency = 0.5;
+    const importance = 0.5;
+    const size = 50;
+    const estimatedHours = 2; // 默认预计耗时2小时
+    const defaultAddTime = 2 * 60 * 60 * 1000; // 默认2小时后结束
+    const urgency = calcUrgency(importance, size, 2, 2); // 默认剩余工作量50%，剩余时间24小时，预计耗时2小时
     const color = calcEventColor(urgency);
     const newEvent: Event = {
       id: `evt_${Date.now()}`,
       name: '新事件',
-      size: 50,
+      size,
       color,
-      importance: 0.5,
+      importance,
       urgency,
       startTime: new Date().toISOString(),
-      endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      endTime: new Date(Date.now() + defaultAddTime).toISOString(),
       details: {
         location: '暂无',
         notes: '暂无',
-        estimatedHours: 24 // 默认预计耗时24小时
+        estimatedHours
       }
     };
 
@@ -243,7 +255,6 @@ const ScheduleArea: React.FC = () => {
 
       // 自动计算紧迫性
       updated.urgency = calcUrgency(importance, remainWork, remainHours, estimatedHours);
-      console.log('importance:', importance, 'remainWork:', remainWork, 'remainHours:', remainHours, 'estimatedHours:', estimatedHours, 'urgency:', updated.urgency);
       updated.color = calcEventColor(updated.urgency);
 
       setTempEvent(updated);
@@ -327,6 +338,17 @@ const ScheduleArea: React.FC = () => {
       )}
 
       <div className="content-area">
+      <Modal
+        visible={helpModalVisible}
+        onClose={() => setHelpModalVisible(false)}
+        title="帮助信息"
+      >
+        <div className="markdown-content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {helpContent}
+          </ReactMarkdown>
+        </div>
+      </Modal>
         <div className="quadrant-view">
           <div className="axis-y"></div>
           <div className="axis-x"></div>
